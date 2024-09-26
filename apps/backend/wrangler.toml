@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "backend"
+name = "medical-assistant-backend"
 main = "src/index.ts"
 compatibility_date = "2024-09-09"
 compatibility_flags = ["nodejs_compat"]
@@ -50,15 +50,15 @@ compatibility_flags = ["nodejs_compat"]
 # Bind a Durable Object. Durable objects are a scale-to-zero compute primitive based on the actor model.
 # Durable Objects can live for as long as needed. Use these when you need a long-running "server", such as in realtime apps.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#durable-objects
-[[durable_objects.bindings]]
-name = "CACHE"
-class_name = "DurableObjectRateLimiter"
+# [[durable_objects.bindings]]
+# name = "CACHE"
+# class_name = "DurableObjectRateLimiter"
 
 # Durable Object migrations.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#migrations
-[[migrations]]
-tag = "v1" # Should be unique for each entry
-new_classes = ["DurableObjectRateLimiter"]
+# [[migrations]]
+# tag = "v1" # Should be unique for each entry
+# new_classes = ["DurableObjectRateLimiter"]
 
 # Bind a Hyperdrive configuration. Use to accelerate access to your existing databases from Cloudflare Workers.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#hyperdrive

@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { JwtPayload } from "aws-jwt-verify/jwt-model";
 import OpenAI from "openai";
-import { DurableObjectRateLimiter } from "@hono-rate-limiter/cloudflare";
 
 export type ApplicationEnv = {
     Variables: {
@@ -21,7 +20,6 @@ export type ApplicationEnv = {
         COGNITO_REGION: string
         COGNITO_CLIENT_ID: string
         OPENAI_API_KEY: string
-        CACHE: DurableObjectNamespace<DurableObjectRateLimiter>
     }
 }
 

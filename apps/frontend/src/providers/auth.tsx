@@ -9,14 +9,6 @@ const amplifyConfig: ResourcesConfig = {
       userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID!,
       loginWith: {
         email: true,
-        oauth: {
-          domain: import.meta.env.VITE_COGNITO_OAUTH_DOMAIN!,
-          redirectSignIn: [import.meta.env.VITE_COGNITO_REDIRECT_URI!],
-          redirectSignOut: [import.meta.env.VITE_COGNITO_SIGNOUT_URI!],
-          responseType: "code",
-          scopes: ["openid", "profile"],
-          providers: ["Google"],
-        },
       },
       passwordFormat: {
         minLength: 8,

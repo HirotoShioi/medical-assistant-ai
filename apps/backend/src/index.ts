@@ -16,33 +16,33 @@ const app = createHono()
 app.use("/*", logger())
 app.use('*', corsMiddleware)
 app.use("/v1/*", authMiddleWare)
-app.use("/v1/chat/completions", rateLimiterMiddleware)
-app.use("/v1/embeddings", rateLimiterMiddleware)
+// app.use("/v1/chat/completions", rateLimiterMiddleware)
+// app.use("/v1/embeddings", rateLimiterMiddleware)
 
 app.get('/', (c) => c.json({
   message: 'Hello World',
 }))
 
-app.get('/v1/usage', async (c) => {
-  const jwtPayload = c.get('jwtPayload')
-  if (!jwtPayload.sub) {
-    throw new Error("Invalid token")
-  }
-  const store = new DurableObjectStore({ namespace: c.env.CACHE })
-  const usage = await store.get(jwtPayload.sub)
-  if (!usage) {
-    return c.json({
-      remaining: RateLimiterConfig.requestLimit,
-      resetAt: Math.floor((Date.now() + 24 * 60 * 60) / 1000),
-      total: RateLimiterConfig.requestLimit,
-    })
-  }
-  return c.json({
-    remaining: RateLimiterConfig.requestLimit - (usage.totalHits || 0),
-    resetAt: Math.floor((usage.resetTime?.getTime() ?? Date.now()) / 1000),
-    total: RateLimiterConfig.requestLimit,
-  })
-})
+// app.get('/v1/usage', async (c) => {
+//   const jwtPayload = c.get('jwtPayload')
+//   if (!jwtPayload.sub) {
+//     throw new Error("Invalid token")
+//   }
+//   const store = new DurableObjectStore({ namespace: c.env.CACHE })
+//   const usage = await store.get(jwtPayload.sub)
+//   if (!usage) {
+//     return c.json({
+//       remaining: RateLimiterConfig.requestLimit,
+//       resetAt: Math.floor((Date.now() + 24 * 60 * 60) / 1000),
+//       total: RateLimiterConfig.requestLimit,
+//     })
+//   }
+//   return c.json({
+//     remaining: RateLimiterConfig.requestLimit - (usage.totalHits || 0),
+//     resetAt: Math.floor((usage.resetTime?.getTime() ?? Date.now()) / 1000),
+//     total: RateLimiterConfig.requestLimit,
+//   })
+// })
 
 app.post('/v1/chat/completions', bodyLimit({
   maxSize: ChatConfig.maxBodySize,
