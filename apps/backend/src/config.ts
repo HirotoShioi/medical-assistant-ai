@@ -16,6 +16,7 @@ export const CorsConfig = {
 		'x-stainless-runtime',
 		'x-stainless-runtime-version',
 		'x-stainless-arch',
+		"x-stainless-retry-count"
 	],
 	allowMethods: ['POST', 'PUT', 'DELETE', 'OPTIONS'],
 	exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],

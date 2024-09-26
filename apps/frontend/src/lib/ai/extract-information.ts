@@ -5,12 +5,16 @@ import { Document } from "@/models";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { codeBlock } from "common-tags";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import { z } from "zod";
 
 export async function summarizeChat(
   messages: Message[],
   documents: Document[]
 ) {
-  const cleanedData = await cleanseData(messages, documents);
+  const [cleanedData, { requests }] = await Promise.all([
+    cleanseData(messages, documents),
+    extractRequests(messages),
+  ]);
   const model = await getModel({
     model: BASE_CHAT_MODEL,
     temperature: 0,
@@ -21,11 +25,40 @@ export async function summarizeChat(
     *** START OF DATA ***
     {data}
     *** END OF DATA ***
+
+    The user's requests are as follows:
+    {requests}
   `);
   return template
     .pipe(model)
     .pipe(new StringOutputParser())
-    .invoke({ data: cleanedData });
+    .invoke({ data: cleanedData, requests: requests?.join("\n") ?? "" });
+}
+
+// 会話履歴から、ユーザーのリクエストを抽出する
+async function extractRequests(messages: Message[]) {
+  const model = await getModel({
+    model: BASE_CHAT_MODEL,
+    temperature: 0,
+  });
+  const schema = z.object({
+    requests: z.array(z.string()).nullable(),
+  });
+  const modelWithSchema = model.withStructuredOutput(schema);
+  const template = PromptTemplate.fromTemplate(codeBlock`
+    You are a medical data analysis assistant.
+    Your job is to extract the user's requests from the following chat history about how the report should be generated.
+    The requests will then be passed to a report generation assistant.
+
+    Only return the requests, no any explanation or commentary.
+
+    *** START OF CHAT ***
+    {messages}
+    *** END OF CHAT ***
+  `);
+  return template
+    .pipe(modelWithSchema)
+    .invoke({ messages: concatMessage(messages) });
 }
 
 // 会話履歴から、不要な情報を削除する
@@ -42,6 +75,8 @@ async function cleanseData(messages: Message[], documents: Document[]) {
     3. Focus on clinical data that could assist healthcare professionals.
     4. Remove any information that could be a hallucination or made up by the assistant.
 
+    Only return the data, no any explanation or commentary.
+
     Here is the data:
 
     *** START OF CHAT ***
@@ -53,9 +88,6 @@ async function cleanseData(messages: Message[], documents: Document[]) {
     *** END OF DOCUMENTS ***
   `);
   // role: 内容となるように整形する
-  const concatChat = (messages: Message[]) => {
-    return messages.map((m) => `${m.role}: ${m.content}`).join("\n");
-  };
 
   // **Title** \n
   // - 内容 \n
@@ -66,7 +98,11 @@ async function cleanseData(messages: Message[], documents: Document[]) {
 
   const chain = template.pipe(model).pipe(new StringOutputParser());
   return chain.invoke({
-    messages: concatChat(messages),
+    messages: concatMessage(messages),
     documents: concatDocuments(documents),
   });
 }
+
+const concatMessage = (messages: Message[]) => {
+  return messages.map((m) => `${m.role}: ${m.content}`).join("\n");
+};

@@ -3,6 +3,8 @@ import { schema } from "@/lib/database/schema";
 import { NewMessageParams } from "@/models";
 import { eq } from "drizzle-orm";
 import { Message } from "@ai-sdk/react";
+import { Message as MessageRow } from "@/models";
+import { ToolInvocation } from "ai";
 export async function saveMessage(input: NewMessageParams) {
   const db = await getDB();
   return db
@@ -22,5 +24,16 @@ export async function getMessagesByThreadId(threadId: string) {
     .select()
     .from(schema.messages)
     .where(eq(schema.messages.threadId, threadId));
-  return messages as unknown as Message[];
+  return messages.map(toMessage);
 }
+
+const toMessage = (message: MessageRow): Message => {
+  return {
+    id: message.id,
+    role: message.role,
+    content: message.content,
+    toolInvocations: JSON.parse(
+      message.toolInvocations as string
+    ) as ToolInvocation[],
+  };
+};
