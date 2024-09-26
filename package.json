@@ -1,0 +1,17 @@
+{
+  "name": "@hirotoshioi/medical-assistant-monorepo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.6.2",
+    "@types/node": "^22.5.4"
+  }
+}

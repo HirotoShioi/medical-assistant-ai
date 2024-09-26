@@ -1,0 +1,122 @@
+{
+  "settings": {
+    "title": "設定",
+    "deleteDatabase": "データベースを削除",
+    "deleteConfirmation": "本当にデータベースを削除しますか？すべてのデータが失われます。",
+    "delete": "削除",
+    "databaseDeleted": "データベースが削除されました",
+    "databaseDeletedDescription": "データベースが削除されました。空のデータベースを再作成します。",
+    "ok": "OK",
+    "language": "言語設定",
+    "cancel": "キャンセル",
+    "deleteThreads": "会話履歴を削除",
+    "threadsDeleted": "削除完了",
+    "threadsDeletedDescription": "会話履歴が削除されました。",
+    "deleteThreadsConfirmation": "本当に会話履歴を削除しますか？削除するとこれまでの会話履歴、及びそれに関連するドキュメントが失われます。"
+  },
+  "notFound": {
+    "title": "404",
+    "description": "申し訳ありません。お探しのページは存在しません。",
+    "goHome": "ホームに戻る"
+  },
+  "greeting": {
+    "morning": "おはようございます",
+    "afternoon": "こんにちは",
+    "evening": "こんばんは"
+  },
+  "index": {
+    "viewAll": "すべて表示",
+    "model": "生成モデル",
+    "send": "送信",
+    "placeholder": "メッセージを入力してください",
+    "recentChats": "最近の会話履歴",
+    "loadingTemplates": "テンプレートを読み込み中...",
+    "title": "医療支援システム",
+    "description": "以下のテンプレートから選択して、AIアシスタントとの会話を開始してください。各テンプレートは特定の医療シナリオに最適化されており、効率的な情報収集と意思決定をサポートします。"
+  },
+  "dropdown": {
+    "signOut": "サインアウト",
+    "signIn": "サインイン",
+    "settings": "設定"
+  },
+  "error": {
+    "unexpectedError": "予期せぬエラーが発生しました。",
+    "goHome": "ホームに戻る"
+  },
+  "usageTooltip": {
+    "pleaseSignIn": "この機能を使用するにはサインインしてください",
+    "signIn": "サインイン",
+    "usageLimit": "使用制限に達しました。"
+  },
+  "chatInput": {
+    "placeholder": "メッセージを入力してください"
+  },
+  "chatTitle": {
+    "renameChat": "チャット名を変更",
+    "newTitle": "新しいチャット名",
+    "save": "保存",
+    "cancel": "キャンセル"
+  },
+  "documentPanel": {
+    "documents": "ドキュメント",
+    "dragAndDropFiles": "ファイルをドラッグして追加"
+  },
+  "documentUploader": {
+    "dropFiles": "ファイルをここにドロップ",
+    "dragAndDropFiles": "ファイルをドラッグして追加",
+    "add": "保存",
+    "enterText": "保存するテキストを入力してください",
+    "addDocuments": "ドキュメントを追加",
+    "addDocumentsDescription": "ドキュメントを追加すると、アプリがユーザーにとって重要な情報に基づいて回答を返せるようになります。"
+  },
+  "toolMessage": {
+    "searchingInformation": "情報を検索中...",
+    "embeddingDocuments": "ドキュメントを埋め込み中...",
+    "processing": "処理中..."
+  },
+  "callback": {
+    "redirecting": "リダイレクト中..."
+  },
+  "database": {
+    "loading": "データベースを読み込み中..."
+  },
+  "page": {
+    "loading": "メッセージとドキュメントを読み込み中...",
+    "loadingThread": "スレッドを読み込み中...",
+    "loadingData": "データを読み込み中..."
+  },
+  "file": {
+    "fileSizeIsTooLarge": "ファイルサイズが大きすぎます",
+    "pleaseUploadFilesSmallerThan5MB": "ファイルサイズは5MB以下にしてください"
+  },
+  "templateCard": {
+    "edit": "編集",
+    "startChat": "開始",
+    "select": "選択",
+    "reset": "初期化",
+    "resetSuccess": "テンプレートが初期化されました",
+    "resetError": "テンプレートの初期化に失敗しました",
+    "resetConfirmation": "テンプレートの初期化",
+    "resetDescription": "テンプレートを初期化すると編集された内容は失われ、元の状態に戻ります。",
+    "cancel": "キャンセル"
+  },
+  "templateForm": {
+    "title": "タイトル",
+    "overview": "概要",
+    "description": "説明",
+    "systemMessage": "システムメッセージ",
+    "initialAssistantMessage": "初期アシスタントメッセージ",
+    "saveButton": "保存",
+    "titlePlaceholder": "タイトルを入力してください",
+    "overviewPlaceholder": "概要を入力してください",
+    "descriptionPlaceholder": "説明を入力してください",
+    "systemMessagePlaceholder": "システムメッセージを入力してください",
+    "initialAssistantMessagePlaceholder": "初期アシスタントメッセージを入力してください",
+    "systemMessageDescription": "AIが問題を解決するために、どのように振る舞うべきかを記載してください。",
+    "initialAssistantMessageDescription": "チャットが開始されたときに表示されるメッセージを入力してください。",
+    "overviewLabel": "概要",
+    "descriptionLabel": "説明",
+    "systemMessageLabel": "システムメッセージ",
+    "initialAssistantMessageLabel": "初期アシスタントメッセージ"
+  }
+}

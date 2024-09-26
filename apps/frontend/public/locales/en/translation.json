@@ -1,0 +1,121 @@
+{
+  "settings": {
+    "title": "Settings",
+    "deleteDatabase": "Delete Database",
+    "deleteConfirmation": "Are you sure you want to delete the database? All your data will be lost.",
+    "delete": "Delete",
+    "databaseDeleted": "Database deleted",
+    "databaseDeletedDescription": "Your database has been deleted. The app will now recreate empty database.",
+    "ok": "OK",
+    "language": "Language",
+    "cancel": "Cancel",
+    "deleteThreads": "Delete Threads",
+    "threadsDeleted": "Delete completed",
+    "threadsDeletedDescription": "Your chat history has been deleted.",
+    "deleteThreadsConfirmation": "Are you sure you want to delete your chat history? Deleting your chat history will also delete all your conversations and related documents."
+  },
+  "notFound": {
+    "title": "404",
+    "description": "Sorry, the page you are looking for does not exist.",
+    "goHome": "Go Home"
+  },
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "index": {
+    "viewAll": "View all",
+    "model": "Model",
+    "send": "Send",
+    "placeholder": "Enter your message...",
+    "recentChats": "Your recent chats",
+    "loadingTemplates": "Loading templates...",
+    "title": "Medical Assistant Powered by AI",
+    "description": "Select from the following templates to start a conversation with the AI assistant. Each template is optimized for a specific medical scenario, supporting efficient information collection and decision-making."
+  },
+  "dropdown": {
+    "signOut": "Sign out",
+    "signIn": "Sign in",
+    "settings": "Settings"
+  },
+  "error": {
+    "unexpectedError": "Sorry, an unexpected error has occurred.",
+    "goHome": "Go Home"
+  },
+  "usageTooltip": {
+    "pleaseSignIn": "Please sign in to use this feature",
+    "signIn": "Sign in",
+    "usageLimit": "You have reached your usage limit."
+  },
+  "chatInput": {
+    "placeholder": "Enter your message..."
+  },
+  "chatTitle": {
+    "renameChat": "Rename Chat",
+    "newTitle": "New title",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "documentPanel": {
+    "documents": "Documents",
+    "dragAndDropFiles": "Drag and drop files into the chat to add them as documents."
+  },
+  "toolMessage": {
+    "searchingInformation": "Searching information",
+    "embeddingDocuments": "Embedding documents",
+    "processing": "Processing..."
+  },
+  "documentUploader": {
+    "dropFiles": "Drop files here",
+    "dragAndDropFiles": "Drag and drop files",
+    "add": "Add",
+    "enterText": "Enter text to save",
+    "addDocuments": "Add documents",
+    "addDocumentsDescription": "Adding documents will allow the app to provide more accurate answers based on important information for the user."
+  },
+  "callback": {
+    "redirecting": "Redirecting..."
+  },
+  "database": {
+    "loading": "Loading database..."
+  },
+  "page": {
+    "loading": "Loading messages and documents...",
+    "loadingThread": "Loading thread...",
+    "loadingData": "Loading data..."
+  },
+  "file": {
+    "fileSizeIsTooLarge": "File size is too large",
+    "pleaseUploadFilesSmallerThan5MB": "Please upload files smaller than 1MB"
+  },
+  "templateCard": {
+    "edit": "Edit",
+    "startChat": "Start",
+    "select": "Select",
+    "reset": "Reset",
+    "resetSuccess": "Template reset successfully",
+    "resetError": "Failed to reset template",
+    "resetConfirmation": "Reset template",
+    "resetDescription": "Resetting the template will reset all settings and the edited content will be lost."
+  },
+  "templateForm": {
+    "title": "Title",
+    "overview": "Overview",
+    "description": "Description",
+    "systemMessage": "System Message",
+    "initialAssistantMessage": "Initial Assistant Message",
+    "saveButton": "Save",
+    "titlePlaceholder": "Enter the title",
+    "overviewPlaceholder": "Enter the overview",
+    "descriptionPlaceholder": "Enter the description",
+    "systemMessagePlaceholder": "Enter the system message",
+    "systemMessageDescription": "Describe how the AI should behave to solve the problem.",
+    "initialAssistantMessagePlaceholder": "Enter the initial assistant message",
+    "initialAssistantMessageDescription": "Enter the message that will be displayed when the chat starts.",
+    "overviewLabel": "Overview",
+    "descriptionLabel": "Description",
+    "systemMessageLabel": "System Message",
+    "initialAssistantMessageLabel": "Initial Assistant Message"
+  }
+}
