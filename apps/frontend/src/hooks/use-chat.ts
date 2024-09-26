@@ -9,7 +9,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getDocumentsByThreadId } from "@/services/documents/service";
-import { generateReport as generateDocument } from "@/lib/ai/generate-report";
+import { generateDocument as generateDocument } from "@/lib/ai/generate-document";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -123,8 +123,10 @@ function generateDocumentTool(threadId: string) {
       "Generate a document from the chat and documents. If user asks for any kind of report or document, use this tool.",
     parameters: z.object({}),
     execute: async () => {
-      const messages = await getMessagesByThreadId(threadId);
-      const documents = await getDocumentsByThreadId(threadId);
+      const [messages, documents] = await Promise.all([
+        getMessagesByThreadId(threadId),
+        getDocumentsByThreadId(threadId),
+      ]);
       return generateDocument(messages, documents);
     },
   });

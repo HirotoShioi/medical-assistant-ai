@@ -7,7 +7,7 @@ import { codeBlock } from "common-tags";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { z } from "zod";
 
-export async function generateReport(
+export async function generateDocument(
   messages: Message[],
   documents: Document[]
 ) {
