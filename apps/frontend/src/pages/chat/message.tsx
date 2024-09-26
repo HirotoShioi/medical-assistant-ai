@@ -17,6 +17,8 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
         return t("toolMessage.searchingInformation");
       case "saveDocument":
         return t("toolMessage.embeddingDocuments");
+      case "generateReport":
+        return t("toolMessage.generatingReport");
       default:
         return t("toolMessage.processing");
     }

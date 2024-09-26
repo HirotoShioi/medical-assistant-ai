@@ -64,7 +64,8 @@
   "toolMessage": {
     "searchingInformation": "Searching information",
     "embeddingDocuments": "Embedding documents",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "generatingReport": "Generating report... (this may take a while)"
   },
   "documentUploader": {
     "dropFiles": "Drop files here",

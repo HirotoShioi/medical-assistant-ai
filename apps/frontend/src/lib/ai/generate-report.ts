@@ -7,7 +7,7 @@ import { codeBlock } from "common-tags";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { z } from "zod";
 
-export async function summarizeChat(
+export async function generateReport(
   messages: Message[],
   documents: Document[]
 ) {
@@ -20,7 +20,7 @@ export async function summarizeChat(
     temperature: 0,
   });
   const template = PromptTemplate.fromTemplate(codeBlock`
-    You are a medical data analysis assistant. Based on the following data, provide a concise summary focused on the key medical information, including but not limited to the patient's symptoms, diagnosis, treatment recommendations, and any relevant history or lab results.
+    You are a medical data analysis assistant. Based on the following data, provide a concise report focused on the key medical information, including but not limited to the patient's symptoms, diagnosis, treatment recommendations, and any relevant history or lab results.
 
     *** START OF DATA ***
     {data}

@@ -9,7 +9,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getDocumentsByThreadId } from "@/services/documents/service";
-import { summarizeChat } from "@/lib/ai/extract-information";
+import { generateReport } from "@/lib/ai/generate-report";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -68,8 +68,8 @@ async function handleChat(req: Request) {
     messages: convertToCoreMessages(messages),
     tools: {
       getRelavantInformation: getRelavantInformationTool(threadId),
-      saveDocument: saveDocumentTool(threadId),
-      summarizeChat: summarizeChatTool(threadId),
+      saveDocument: saveDocumentTool(),
+      generateReport: generateReportTool(threadId),
     },
   });
   return result.toDataStreamResponse();
@@ -102,30 +102,30 @@ function getRelavantInformationTool(threadId: string) {
   });
 }
 
-function saveDocumentTool(threadId: string) {
+function saveDocumentTool() {
   return tool({
     description:
-      "Add a document to the knowledge base. Use three sentences at maximum to describe what the document is.",
+      "Add a document to the knowledge base. Use three sentences at maximum to describe what the document is. Do not call this tool directly, it is used internally by the system.",
     parameters: z.object({
       title: z.string().describe("The title of the document."),
       content: z.string().describe("The content of the document."),
       fileType: z.string().describe("The file type of the document."),
     }),
-    execute: async ({ title, content, fileType }) => {
-      console.log(title, content, fileType, threadId);
+    execute: async () => {
+      return "Document saved";
     },
   });
 }
 
-function summarizeChatTool(threadId: string) {
+function generateReportTool(threadId: string) {
   return tool({
-    description: "Summarize the chat and documents.",
+    description: "Generate a report from the chat and documents.",
     parameters: z.object({}),
     execute: async () => {
       const messages = await getMessagesByThreadId(threadId);
       const documents = await getDocumentsByThreadId(threadId);
-      return summarizeChat(messages, documents);
+      return generateReport(messages, documents);
     },
   });
 }
-export type ToolNames = "getRelavantInformation" | "saveDocument";
+export type ToolNames = "getRelavantInformation" | "saveDocument" | "generateReport";
