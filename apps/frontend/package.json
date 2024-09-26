@@ -14,7 +14,8 @@
     "deploy": "pnpm run build && wrangler pages deploy ./dist"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.45",
+    "@ai-sdk/openai": "^0.0.62",
+    "@ai-sdk/react": "^0.0.60",
     "@aws-amplify/ui-react": "^6.3.1",
     "@cloudflare/workers-types": "^4.20240909.0",
     "@electric-sql/pglite": "^0.2.6",
