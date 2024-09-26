@@ -48,7 +48,7 @@ export default function SignInPage() {
     <div className="flex flex-col h-screen w-screen">
       <Header />
       <div className="flex-1 flex items-center justify-center">
-        <Authenticator />
+        <Authenticator hideSignUp={true} />
       </div>
     </div>
   );

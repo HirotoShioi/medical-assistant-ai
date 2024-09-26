@@ -31,6 +31,7 @@ import { useTranslation } from "react-i18next";
 import { useResetTemplateMutation } from "@/services/templates/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { useAlert } from "@/components/alert";
+import { useAuthenticator } from "@aws-amplify/ui-react";
 
 type TemplateCardProps = {
   template: Template;
@@ -42,12 +43,27 @@ export const TemplateCard = ({ template }: TemplateCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { mutateAsync: createChat } = useCreateThreadMutation();
   const { mutate: resetTemplate } = useResetTemplateMutation();
+  const { user } = useAuthenticator((context) => [context.user]);
   const { openAlert } = useAlert();
   const { toast } = useToast();
   const navigate = useNavigate();
   const newId = newThreadId();
   const handleStartChat = async () => {
     setIsDialogOpen(false);
+    if (!user) {
+      openAlert({
+        title: t("templateCard.signInRequired"),
+        description: t("templateCard.signInDescription"),
+        actions: [
+          {
+            label: t("templateCard.signIn"),
+            variant: "action",
+            onClick: () => navigate("/sign-in"),
+          },
+        ],
+      });
+      return;
+    }
     await createChat({
       threadId: newId,
       title: `${template.title} - ${formatDate(new Date(), "yyyy-MM-dd HH:mm")}`,

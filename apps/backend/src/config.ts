@@ -4,7 +4,7 @@ export const RateLimiterConfig = {
 };
 
 export const CorsConfig = {
-	origin: ['http://localhost:5173', 'https://whisperer.pages.dev'],
+	origin: ['http://localhost:5173', 'https://medical-assistant.pages.dev'],
 	allowHeaders: [
 		'Authorization',
 		'Content-Type',

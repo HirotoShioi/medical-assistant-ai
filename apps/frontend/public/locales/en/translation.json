@@ -97,7 +97,10 @@
     "resetSuccess": "Template reset successfully",
     "resetError": "Failed to reset template",
     "resetConfirmation": "Reset template",
-    "resetDescription": "Resetting the template will reset all settings and the edited content will be lost."
+    "resetDescription": "Resetting the template will reset all settings and the edited content will be lost.",
+    "signInRequired": "Sign in required",
+    "signInDescription": "Sign in to use the template.",
+    "signIn": "Sign in"
   },
   "templateForm": {
     "title": "Title",

@@ -98,7 +98,10 @@
     "resetError": "テンプレートの初期化に失敗しました",
     "resetConfirmation": "テンプレートの初期化",
     "resetDescription": "テンプレートを初期化すると編集された内容は失われ、元の状態に戻ります。",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "signInRequired": "サインインが必要です",
+    "signInDescription": "サインインしてからテンプレートを使用してください",
+    "signIn": "サインイン"
   },
   "templateForm": {
     "title": "タイトル",
