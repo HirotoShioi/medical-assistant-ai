@@ -63,7 +63,7 @@ export function ChatContextProvider({
   const [isDocumentUploaderOpen, setIsDocumentUploaderOpen] = useState(false);
   const { ref: scrollRef, scrollToEnd } = useAutoScroll();
   const chatHook = useChat(thread.id, messages);
-  const { mutateAsync: saveDocument } = useDocumentCreateMutation();
+  const { mutateAsync: embedDocument } = useDocumentCreateMutation();
   const { user } = useAuthenticator((u) => [u.user]);
   const [panelState, setPanelState] = useState<PanelState>(() => {
     if (window.innerWidth < 768) {
@@ -110,7 +110,7 @@ export function ChatContextProvider({
       const fileWithText = await Promise.all(
         acceptedFiles.map(async (file) => {
           const { content, fileType } = await parseFile(file, file.type);
-          await saveDocument(
+          await embedDocument(
             {
               threadId: thread.id,
               content,
@@ -144,7 +144,7 @@ export function ChatContextProvider({
         toolInvocations: fileWithText.map(({ text, file }) => ({
           state: "result" as const,
           toolCallId: nanoid(),
-          toolName: "saveDocument",
+          toolName: "embedDocument",
           args: {},
           result: {
             success: true,

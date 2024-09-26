@@ -9,7 +9,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getDocumentsByThreadId } from "@/services/documents/service";
-import { generateReport } from "@/lib/ai/generate-report";
+import { generateReport as generateDocument } from "@/lib/ai/generate-report";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -68,8 +68,8 @@ async function handleChat(req: Request) {
     messages: convertToCoreMessages(messages),
     tools: {
       getRelavantInformation: getRelavantInformationTool(threadId),
-      saveDocument: saveDocumentTool(),
-      generateReport: generateReportTool(threadId),
+      embedDocument: embedDocumentTool(),
+      generateDocument: generateDocumentTool(threadId),
     },
   });
   return result.toDataStreamResponse();
@@ -102,10 +102,10 @@ function getRelavantInformationTool(threadId: string) {
   });
 }
 
-function saveDocumentTool() {
+function embedDocumentTool() {
   return tool({
     description:
-      "Add a document to the knowledge base. Use three sentences at maximum to describe what the document is. Do not call this tool directly, it is used internally by the system.",
+      "Embed a document into the knowledge base. Do not call this tool directly, it is used internally by the system.",
     parameters: z.object({
       title: z.string().describe("The title of the document."),
       content: z.string().describe("The content of the document."),
@@ -117,15 +117,16 @@ function saveDocumentTool() {
   });
 }
 
-function generateReportTool(threadId: string) {
+function generateDocumentTool(threadId: string) {
   return tool({
-    description: "Generate a report from the chat and documents.",
+    description:
+      "Generate a document from the chat and documents. If user asks for any kind of report or document, use this tool.",
     parameters: z.object({}),
     execute: async () => {
       const messages = await getMessagesByThreadId(threadId);
       const documents = await getDocumentsByThreadId(threadId);
-      return generateReport(messages, documents);
+      return generateDocument(messages, documents);
     },
   });
 }
-export type ToolNames = "getRelavantInformation" | "saveDocument" | "generateReport";
+export type ToolNames = "getRelavantInformation" | "embedDocument" | "generateDocument";

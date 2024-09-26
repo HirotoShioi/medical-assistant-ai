@@ -15,7 +15,7 @@ async function generateChunks(input: string): Promise<string[]> {
   return chunks.map((chunk) => chunk.pageContent);
 }
 
-export const saveDocument = async (input: NewDocumentParams) => {
+export const embedDocument = async (input: NewDocumentParams) => {
   const db = await getDB();
   try {
     const { content, threadId, title, fileType } =

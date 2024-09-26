@@ -73,7 +73,7 @@
     "searchingInformation": "情報を検索中...",
     "embeddingDocuments": "ドキュメントを埋め込み中...",
     "processing": "処理中...",
-    "generatingReport": "レポートを生成中... (これには時間がかかる場合があります)"
+    "generatingDocument": "ドキュメントを生成中... (これには時間がかかる場合があります)"
   },
   "callback": {
     "redirecting": "リダイレクト中..."

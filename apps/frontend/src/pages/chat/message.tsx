@@ -15,10 +15,10 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
     switch (toolInvocation.toolName as ToolNames) {
       case "getRelavantInformation":
         return t("toolMessage.searchingInformation");
-      case "saveDocument":
+      case "embedDocument":
         return t("toolMessage.embeddingDocuments");
-      case "generateReport":
-        return t("toolMessage.generatingReport");
+      case "generateDocument":
+        return t("toolMessage.generatingDocument");
       default:
         return t("toolMessage.processing");
     }

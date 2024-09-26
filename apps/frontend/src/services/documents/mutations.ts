@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteDocumentById, saveDocument } from "./service";
+import { deleteDocumentById, embedDocument } from "./service";
 import { NewDocumentParams } from "@/models";
 
 export const useDocumentDeleteMutation = () => {
@@ -15,7 +15,7 @@ export const useDocumentDeleteMutation = () => {
 export const useDocumentCreateMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (params: NewDocumentParams) => saveDocument(params),
+    mutationFn: (params: NewDocumentParams) => embedDocument(params),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["usage"],

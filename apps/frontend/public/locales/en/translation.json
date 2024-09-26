@@ -65,7 +65,7 @@
     "searchingInformation": "Searching information",
     "embeddingDocuments": "Embedding documents",
     "processing": "Processing...",
-    "generatingReport": "Generating report... (this may take a while)"
+    "generatingDocument": "Generating document... (this may take a while)"
   },
   "documentUploader": {
     "dropFiles": "Drop files here",
