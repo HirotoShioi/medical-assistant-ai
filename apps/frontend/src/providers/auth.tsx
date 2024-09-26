@@ -8,7 +8,7 @@ const amplifyConfig: ResourcesConfig = {
       userPoolClientId: import.meta.env.VITE_COGNITO_USER_POOL_CLIENT_ID!,
       userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID!,
       loginWith: {
-        email: true,
+        username: true,
       },
       passwordFormat: {
         minLength: 8,

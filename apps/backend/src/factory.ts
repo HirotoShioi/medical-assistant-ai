@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { JwtPayload } from "aws-jwt-verify/jwt-model";
 import OpenAI from "openai";
-
 export type ApplicationEnv = {
     Variables: {
         jwtVerifier: CognitoJwtVerifierSingleUserPool<{

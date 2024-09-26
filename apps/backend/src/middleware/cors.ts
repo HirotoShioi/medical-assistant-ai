@@ -2,10 +2,11 @@ import { Context } from 'hono';
 import { cors } from 'hono/cors';
 import { createMiddleware } from 'hono/factory';
 import { CorsConfig } from '../config';
+import { ApplicationEnv } from '../factory';
 
 
 // x-stainless-* headers are used by stainless (OpenAI's SDK)
-export const corsMiddleware = createMiddleware((c: Context, next) => {
+export const corsMiddleware = createMiddleware<ApplicationEnv>((c, next) => {
 	return cors({
 		origin: CorsConfig.origin,
 		allowHeaders: CorsConfig.allowHeaders,
