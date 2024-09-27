@@ -1,16 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { Message } from "ai/react";
 import { useChat } from "@/hooks/use-chat";
 import { Document, Thread } from "@/models";
-import { useNavigate } from "react-router-dom";
 import { useAlert } from "@/components/alert";
-import {
-  loadFromLocalStorage,
-  deleteFromLocalStorage,
-} from "@/utils/local-storage";
 import { useAutoScroll } from "@/hooks/use-auto-scroll";
-import { useRenameThreadMutation } from "@/services/threads/mutations";
-import { nameConversation } from "@/lib/ai/name-conversation";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Usage } from "@/services/usage";
 import { MAXIMUM_FILE_SIZE_IN_BYTES, PREVIEW_TEXT_LENGTH } from "@/constants";
@@ -57,9 +50,7 @@ export function ChatContextProvider({
   documents,
   usage,
 }: ChatContextProviderProps) {
-  const { mutateAsync: renameThread } = useRenameThreadMutation();
   const { openAlert } = useAlert();
-  const navigate = useNavigate();
   const isSmallScreen = useMediaQuery("(max-width: 1200px)");
   const [isDocumentUploaderOpen, setIsDocumentUploaderOpen] = useState(false);
   const { ref: scrollRef, scrollToEnd } = useAutoScroll();
@@ -71,19 +62,6 @@ export function ChatContextProvider({
     }
     return "list";
   });
-
-  // ここもあとで修正する
-  useEffect(() => {
-    const message = loadFromLocalStorage(thread.id);
-    if (message && messages.length <= 0) {
-      const parsedMessage = JSON.parse(message);
-      chatHook.append(parsedMessage);
-      deleteFromLocalStorage(thread.id);
-      nameConversation(parsedMessage.content).then((name) =>
-        renameThread({ threadId: thread.id, title: name })
-      );
-    }
-  }, [thread.id, messages, chatHook, openAlert, navigate, renameThread]);
 
   async function uploadFiles(acceptedFiles: File[]) {
     if (!user) {
