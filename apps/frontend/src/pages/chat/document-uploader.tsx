@@ -18,7 +18,6 @@ import { UsageTooltip } from "@/components/usage-tooltip";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { convertTextToMarkdown } from "@/lib/ai/convert-text-to-markdown";
 
 export default function DocumentUploader() {
   const {
@@ -26,7 +25,7 @@ export default function DocumentUploader() {
     setIsDocumentUploaderOpen,
     usage,
     uploadFiles,
-    setIsUploadingDocuments,
+    uploadText: uploadTextMutation,
   } = useChatContext();
   const { t } = useTranslation();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -47,21 +46,12 @@ export default function DocumentUploader() {
     },
   });
 
-  const uploadText = async () => {
+  const handleUploadText = async () => {
     if (!user || usage.isZero || !textAreaRef.current?.value) {
       return;
     }
-    setIsUploadingDocuments(true);
     setIsDocumentUploaderOpen(false);
-    try {
-      const markdown = await convertTextToMarkdown(textAreaRef.current.value);
-      const file = new File([markdown.content], markdown.title, {
-        type: "text/markdown",
-      });
-      await uploadFiles([file]);
-    } finally {
-      setIsUploadingDocuments(false);
-    }
+    await uploadTextMutation(textAreaRef.current.value);
   };
 
   return (
@@ -110,7 +100,7 @@ export default function DocumentUploader() {
         </div>
         <DialogFooter className="flex justify-end">
           <UsageTooltip usage={usage}>
-            <Button onClick={uploadText} disabled={usage.isZero}>
+            <Button onClick={handleUploadText} disabled={usage.isZero}>
               {t("documentUploader.add")}
             </Button>
           </UsageTooltip>

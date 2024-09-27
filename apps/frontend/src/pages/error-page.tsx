@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useRouteError } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import Header from "@/components/header";
 
 export default function ErrorPage() {
   const error = useRouteError() as Error;
@@ -14,6 +15,7 @@ export default function ErrorPage() {
 
   return (
     <div id="error-page">
+      <Header />
       <div className={cn(pageWrapperStyles, "space-y-4")}>
         <h1 className="text-2xl">Oops!</h1>
         <div>

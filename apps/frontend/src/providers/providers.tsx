@@ -6,6 +6,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      throwOnError: true,
+      retry: 1,
     },
     mutations: {
       retry: false,

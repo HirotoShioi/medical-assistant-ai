@@ -18,7 +18,9 @@ import { parseFile } from "@/lib/file";
 import { t } from "i18next";
 import { nanoid } from "nanoid";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { useDocumentCreateMutation } from "@/services/documents/mutations";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { convertTextToMarkdown } from "@/lib/ai/convert-text-to-markdown";
+import { embedDocument } from "@/services/documents/service";
 
 export type PanelState = "closed" | "list" | "detail";
 
@@ -32,11 +34,11 @@ interface ChatContextType {
   isDocumentUploaderOpen: boolean;
   setIsDocumentUploaderOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isUploadingDocuments: boolean;
-  setIsUploadingDocuments: React.Dispatch<React.SetStateAction<boolean>>;
   isSmallScreen: boolean;
   thread: Thread;
   usage: Usage;
   uploadFiles: (acceptedFiles: File[]) => Promise<void>;
+  uploadText: (text: string) => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -57,13 +59,11 @@ export function ChatContextProvider({
 }: ChatContextProviderProps) {
   const { mutateAsync: renameThread } = useRenameThreadMutation();
   const { openAlert } = useAlert();
-  const [isUploadingDocuments, setIsUploadingDocuments] = useState(false);
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery("(max-width: 1200px)");
   const [isDocumentUploaderOpen, setIsDocumentUploaderOpen] = useState(false);
   const { ref: scrollRef, scrollToEnd } = useAutoScroll();
   const chatHook = useChat(thread.id, messages);
-  const { mutateAsync: embedDocument } = useDocumentCreateMutation();
   const { user } = useAuthenticator((u) => [u.user]);
   const [panelState, setPanelState] = useState<PanelState>(() => {
     if (window.innerWidth < 768) {
@@ -89,7 +89,6 @@ export function ChatContextProvider({
     if (!user) {
       return;
     }
-    setIsUploadingDocuments(true);
     setIsDocumentUploaderOpen(false);
     if (acceptedFiles.length <= 0) {
       return;
@@ -106,66 +105,80 @@ export function ChatContextProvider({
       });
       return;
     }
-    try {
-      const fileWithText = await Promise.all(
-        acceptedFiles.map(async (file) => {
-          const { content, fileType } = await parseFile(file, file.type);
-          await embedDocument(
-            {
-              threadId: thread.id,
-              content,
-              title: file.name,
-              fileType,
-            },
-            {
-              onError: (error) => {
-                openAlert({
-                  title: "Error",
-                  description: error.message,
-                  actions: [
-                    {
-                      label: "OK",
-                    },
-                  ],
-                });
-              },
-            }
-          );
-          return {
-            text: content,
-            file,
-          };
-        })
-      );
-      const message: Message = {
-        id: nanoid(),
-        role: "assistant" as const,
-        content: "",
-        toolInvocations: fileWithText.map(({ text, file }) => ({
-          state: "result" as const,
-          toolCallId: nanoid(),
-          toolName: "embedDocument",
-          args: {},
-          result: {
-            success: true,
-            fileId: nanoid(),
-            file: {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-            },
-            preview: text.slice(0, PREVIEW_TEXT_LENGTH).trim(),
+    const fileWithText = await Promise.all(
+      acceptedFiles.map(async (file) => {
+        const { content, fileType } = await parseFile(file, file.type);
+        await embedDocument(
+          {
+            threadId: thread.id,
+            content,
+            title: file.name,
+            fileType,
           },
-        })),
-      };
-      chatHook.append(message);
-      setPanelState("list");
-      scrollToEnd();
-    } finally {
-      setIsUploadingDocuments(false);
-    }
+        )
+        return {
+          text: content,
+          file,
+        };
+      })
+    );
+    const message: Message = {
+      id: nanoid(),
+      role: "assistant" as const,
+      content: "",
+      toolInvocations: fileWithText.map(({ text, file }) => ({
+        state: "result" as const,
+        toolCallId: nanoid(),
+        toolName: "embedDocument",
+        args: {},
+        result: {
+          success: true,
+          fileId: nanoid(),
+          file: {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+          },
+          preview: text.slice(0, PREVIEW_TEXT_LENGTH).trim(),
+        },
+      })),
+    };
+    chatHook.append(message);
+    setPanelState("list");
+    scrollToEnd();
   }
 
+  const queryClient = useQueryClient();
+  const uploadFilesMutation = useMutation({
+    mutationFn: async (acceptedFiles: File[]) => {
+      return uploadFiles(acceptedFiles);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["usage"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["documents", { threadId: thread.id }],
+      });
+    },
+  });
+  const uploadText = useMutation({
+    mutationFn: async (text: string) => {
+      const markdown = await convertTextToMarkdown(text);
+      const file = new File([markdown.content], markdown.title, {
+        type: "text/markdown",
+      });
+      return uploadFiles([file]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["usage"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["documents", { threadId: thread.id }],
+      });
+    },
+  });
   return (
     <ChatContext.Provider
       value={{
@@ -178,9 +191,9 @@ export function ChatContextProvider({
         scrollToEnd,
         isDocumentUploaderOpen,
         setIsDocumentUploaderOpen,
-        isUploadingDocuments,
-        setIsUploadingDocuments,
-        uploadFiles,
+        isUploadingDocuments: uploadFilesMutation.isPending || uploadText.isPending,
+        uploadFiles: uploadFilesMutation.mutateAsync,
+        uploadText: uploadText.mutateAsync,
         thread,
         usage,
       }}
