@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { MessageComponent } from "./message";
+import ChatMessage from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { DocumentPanel } from "./document-panel";
 import { ChatContextProvider, useChatContext } from "@/pages/chat/context";
@@ -79,9 +79,12 @@ function ChatPageContent() {
         <div className="flex-grow overflow-hidden flex flex-col">
           <div className="flex-grow overflow-y-auto" ref={scrollRef}>
             <div className="mx-auto">
-              {chatHook.messages.map((message) => (
+              {chatHook.messages.map((message, i) => (
                 <ChatContainer key={message.id}>
-                  <MessageComponent message={message} />
+                  <ChatMessage
+                    message={message}
+                    isLast={i === chatHook.messages.length - 1}
+                  />
                 </ChatContainer>
               ))}
             </div>
