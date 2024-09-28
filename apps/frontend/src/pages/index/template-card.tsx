@@ -159,7 +159,7 @@ export const TemplateCard = ({ template }: TemplateCardProps) => {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="flex items-center space-x-2 text-2xl">
-                {template.icon}
+              {iconMap[template.icon as keyof typeof iconMap]}
                 <span>{template.title}</span>
               </DialogTitle>
               <DialogDescription className="text-gray-700 mt-4">

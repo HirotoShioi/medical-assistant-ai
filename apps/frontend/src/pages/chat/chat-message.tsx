@@ -1,4 +1,4 @@
-import { Message as M } from "ai/react";
+import { Message } from "ai/react";
 import { Markdown } from "@/components/markdown";
 import { ToolNames } from "@/hooks/use-chat";
 import { useTranslation } from "react-i18next";
@@ -32,11 +32,11 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
 }
 
 export type ChatMessageProps = {
-  message: M;
+  message: Message;
   isLast: boolean;
 };
 
-function MessageComponent({ message }: ChatMessageProps) {
+function ChatMessage({ message }: ChatMessageProps) {
   if (message.role === "user") {
     return (
       <div className="text-base w-full">
@@ -78,7 +78,7 @@ function MessageComponent({ message }: ChatMessageProps) {
 
 // Memoizing is important here - otherwise React continually
 // re-renders previous messages unnecessarily (big performance hit)
-export default memo(MessageComponent, (prevProps, nextProps) => {
+export default memo(ChatMessage, (prevProps, nextProps) => {
   // Always re-render the last message to fix a bug where `useChat()`
   // doesn't trigger a re-render when multiple tool calls are added
   // to the same message. Otherwise shallow compare.
