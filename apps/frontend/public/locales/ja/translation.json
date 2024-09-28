@@ -114,13 +114,16 @@
     "titlePlaceholder": "タイトルを入力してください",
     "overviewPlaceholder": "概要を入力してください",
     "descriptionPlaceholder": "説明を入力してください",
-    "systemMessagePlaceholder": "システムメッセージを入力してください",
-    "initialAssistantMessagePlaceholder": "初期アシスタントメッセージを入力してください",
+    "systemMessagePlaceholder": "システムメッセージを記載してください",
+    "initialAssistantMessagePlaceholder": "初期アシスタントメッセージを記載してください",
     "systemMessageDescription": "AIが問題を解決するために、どのように振る舞うべきかを記載してください。",
-    "initialAssistantMessageDescription": "チャットが開始されたときに表示されるメッセージを入力してください。",
+    "initialAssistantMessageDescription": "チャットが開始されたときに表示されるメッセージを記載してください。",
     "overviewLabel": "概要",
     "descriptionLabel": "説明",
     "systemMessageLabel": "システムメッセージ",
-    "initialAssistantMessageLabel": "初期アシスタントメッセージ"
+    "initialAssistantMessageLabel": "初期アシスタントメッセージ",
+    "reportGenerationPromptLabel": "書類作成時に気をつけるべき点",
+    "reportGenerationPromptDescription": "書類のフォーマット、文章構成、出力例を記入すると、より精度の高い書類を生成できます。",
+    "reportGenerationPromptPlaceholder": "書類作成時に気をつけるべき点を記載してください。"
   }
 }

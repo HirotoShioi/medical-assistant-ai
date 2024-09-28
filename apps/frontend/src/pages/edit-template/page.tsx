@@ -27,7 +27,7 @@ export default function EditTemplatePage() {
       return;
     }
     await updateTemplate({
-      templateId: template.id,
+      id: template.id,
       ...params,
     });
     toast({

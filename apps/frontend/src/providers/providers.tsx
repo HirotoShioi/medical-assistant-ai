@@ -1,7 +1,7 @@
 import { AuthProvider } from "./auth";
 import { PgliteProvider } from "./pglite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -21,6 +21,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <PgliteProvider>{children}</PgliteProvider>
       </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

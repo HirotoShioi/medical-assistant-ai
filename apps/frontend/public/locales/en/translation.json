@@ -120,6 +120,9 @@
     "overviewLabel": "Overview",
     "descriptionLabel": "Description",
     "systemMessageLabel": "System Message",
-    "initialAssistantMessageLabel": "Initial Assistant Message"
-  }
+    "initialAssistantMessageLabel": "Initial Assistant Message",
+    "reportGenerationPromptLabel": "Report Generation Prompt",
+    "reportGenerationPromptDescription": "Enter the prompt for the AI to generate a report.",
+    "reportGenerationPromptPlaceholder": "Enter the prompt for the AI to generate a report."
+  } 
 }

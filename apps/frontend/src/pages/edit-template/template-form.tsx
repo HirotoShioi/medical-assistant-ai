@@ -23,6 +23,7 @@ export type TemplateFormData = {
   description: string;
   systemMessage: string;
   initialAssistantMessage: string;
+  reportGenerationPrompt?: string;
 };
 
 export type TemplateFormProps = {
@@ -47,6 +48,9 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
     initialAssistantMessage: z.string().min(1).max(1600, {
       message: "初期メッセージは1600文字以内で入力してください。",
     }),
+    reportGenerationPrompt: z.string().min(1).max(600, {
+      message: "書類作成時に気をつけるべき点は600文字以内で入力してください。",
+    }).nullable(),
   });
   const form = useForm<TemplateFormData>({
     resolver: zodResolver(schema),
@@ -56,6 +60,7 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
       description: template?.description ?? "",
       systemMessage: template?.systemMessage ?? "",
       initialAssistantMessage: template?.initialAssistantMessage ?? "",
+      reportGenerationPrompt: template?.reportGenerationPrompt,
     },
   });
 
@@ -177,6 +182,31 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
                 )}
               />
             </div>
+            {template?.type === "report" && (
+              <div className="space-y-2">
+                <FormField
+                control={form.control}
+                name="reportGenerationPrompt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("templateForm.reportGenerationPromptLabel")}</FormLabel>
+                    <FormDescription>
+                      {t('templateForm.reportGenerationPromptDescription')}
+                    </FormDescription>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        rows={15}
+                        className="resize-none"
+                        placeholder={t("templateForm.reportGenerationPromptPlaceholder")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+                />
+              </div>
+            )}
             <div className="flex justify-end">
               <Button type="submit" disabled={!isSubmittable}>
                 {t("templateForm.saveButton")}

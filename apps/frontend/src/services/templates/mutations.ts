@@ -9,7 +9,7 @@ export const useUpdateTemplateMutation = () => {
     onSuccess: (_, variables) => {
       client.invalidateQueries({ queryKey: ["templates"] });
       client.invalidateQueries({
-        queryKey: ["template", { id: variables.templateId }],
+        queryKey: ["template", { id: variables.id }],
       });
     },
   });
