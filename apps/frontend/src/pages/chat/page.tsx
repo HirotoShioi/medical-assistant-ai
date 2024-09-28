@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ChatMessage from "./chat-message";
-import { ChatInput } from "./chat-input";
+import ChatInput from "./chat-input";
 import { DocumentPanel } from "./document-panel";
 import { ChatContextProvider, useChatContext } from "@/pages/chat/context";
 import React from "react";
