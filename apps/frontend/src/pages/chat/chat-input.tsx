@@ -6,6 +6,7 @@ import { UsageTooltip } from "@/components/usage-tooltip";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { useTranslation } from "react-i18next";
 import { useMessageCreateMutation } from "@/services/messages/mutations";
+import { cn } from "@/lib/utils";
 
 export function ChatInput() {
   const { chatHook, usage, thread, scrollToEnd, setIsDocumentUploaderOpen } =
@@ -16,6 +17,7 @@ export function ChatInput() {
   const { user } = useAuthenticator((context) => [context.user]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { mutateAsync: saveMessage } = useMessageCreateMutation();
+  const [isFocused, setIsFocused] = useState(false);
 
   const calculateRows = useCallback(() => {
     if (textareaRef.current) {
@@ -53,6 +55,9 @@ export function ChatInput() {
     chatHook.handleInputChange(e);
   };
 
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+
   const submitMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     if (!user || chatHook.input.length <= 0) return;
 
@@ -66,7 +71,12 @@ export function ChatInput() {
   };
 
   return (
-    <div className="p-2 bg-muted lg:gap-1 rounded-[26px] border-2 border-gray-300 shadow-md w-full">
+    <div
+      className={cn(
+        "p-2 bg-muted lg:gap-1 rounded-[26px] border-2 shadow-md w-full transition-colors duration-200 ease-in-out",
+        isFocused ? "border-blue-500" : "border-gray-300"
+      )}
+    >
       <div className="flex items-end gap-1.5 md:gap-2">
         <div className="relative">
           <UsageTooltip usage={usage}>
@@ -86,17 +96,22 @@ export function ChatInput() {
             e.preventDefault();
             submitMessage(e);
           }}
-          className="flex gap-2 w-full items-center"
+          className="w-full"
         >
           <textarea
             ref={textareaRef}
-            className="w-full bg-muted rounded-lg border-0 focus:outline-none focus:ring-0 resize-none h-full"
+            className={cn(
+              "w-full bg-muted rounded-lg border-0 focus:outline-none focus:ring-0 resize-none h-full",
+              chatHook.isLoading || usage.isZero ? "cursor-not-allowed opacity-50" : ""
+            )}
             style={{ minHeight: "20px" }}
             placeholder={t("chatInput.placeholder")}
             onChange={handleTextareaChange}
             disabled={chatHook.isLoading || usage.isZero}
             onCompositionStart={() => setIsComposing(true)}
             onCompositionEnd={() => setIsComposing(false)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             id="chat-input"
             onKeyDown={(e) => {
               if (e.key === "Enter" && e.shiftKey) {
@@ -124,7 +139,12 @@ export function ChatInput() {
               disabled={
                 chatHook.isLoading || chatHook.input.length <= 0 || usage.isZero
               }
-              className="rounded-full p-2 w-10 h-10"
+              className={cn(
+                "rounded-full p-2 w-10 h-10",
+                chatHook.isLoading || chatHook.input.length <= 0 || usage.isZero
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              )}
               size="icon"
             >
               <PenSquareIcon className="h-4 w-4" />
