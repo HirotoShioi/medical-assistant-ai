@@ -67,7 +67,7 @@ importers:
         specifier: ^4.20240909.0
         version: 4.20240909.0
       '@electric-sql/pglite':
-        specifier: ^0.2.8s
+        specifier: ^0.2.8
         version: 0.2.8
       '@electric-sql/pglite-react':
         specifier: ^0.2.8

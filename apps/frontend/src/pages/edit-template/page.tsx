@@ -11,7 +11,7 @@ export default function EditTemplatePage() {
   const { templateId } = useParams();
   const navigate = useNavigate();
   const { data: template, isLoading } = useTemplateQueryById(templateId);
-  const { mutateAsync: updateTemplate } = useUpdateTemplateMutation();
+  const { mutate: updateTemplate } = useUpdateTemplateMutation();
   const { toast } = useToast();
   if (!templateId) {
     navigate("/not-found");
@@ -26,15 +26,26 @@ export default function EditTemplatePage() {
     if (!template) {
       return;
     }
-    await updateTemplate({
+    updateTemplate({
       id: template.id,
       ...params,
-    });
-    toast({
-      title: "テンプレート更新",
-      variant: "success",
-      description: "テンプレートを更新しました。",
-    });
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "テンプレート更新",
+          variant: "info",
+          description: "テンプレートを更新しました。",
+        });
+        },
+        onError: (error) => {
+          toast({
+            title: "テンプレート更新失敗",
+            variant: "destructive",
+            description: error.message,
+          });
+        },
+      }
+    );
   }
   return (
     <>

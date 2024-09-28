@@ -10,6 +10,7 @@ import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getDocumentsByThreadId } from "@/services/documents/service";
 import { generateDocument as generateDocument } from "@/lib/ai/generate-document";
+import { ThreadSettings } from "@/models";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -69,7 +70,7 @@ async function handleChat(req: Request) {
     tools: {
       getRelavantInformation: getRelavantInformationTool(threadId),
       embedDocument: embedDocumentTool(),
-      generateDocument: generateDocumentTool(threadId),
+      generateDocument: generateDocumentTool(threadId, settings),
     },
   });
   return result.toDataStreamResponse();
@@ -117,7 +118,7 @@ function embedDocumentTool() {
   });
 }
 
-function generateDocumentTool(threadId: string) {
+function generateDocumentTool(threadId: string, settings: ThreadSettings) {
   return tool({
     description:
       "Generate a document from the chat and documents. If user asks for any kind of report or document, use this tool.",
@@ -127,7 +128,11 @@ function generateDocumentTool(threadId: string) {
         getMessagesByThreadId(threadId),
         getDocumentsByThreadId(threadId),
       ]);
-      return generateDocument(messages, documents);
+      return generateDocument({
+        documentGenerationPrompt: settings.reportGenerationPrompt ?? undefined,
+        messages,
+        documents,
+      });
     },
   });
 }

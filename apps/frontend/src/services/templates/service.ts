@@ -24,7 +24,6 @@ export const getTemplateById = async (id: string): Promise<Template | null> => {
   return templates.map(toTemplate)[0] ?? null;
 };
 
-
 export const createTemplate = async (
   template: NewTemplateParams
 ): Promise<Template[]> => {
@@ -58,30 +57,27 @@ export const updateTemplate = async (params: UpdateTemplateParams) => {
   if (error) {
     throw new Error(error.message);
   }
+  const { id, ...rest } = params;
   const db = await getDB();
   const [template] = await db
     .update(schema.templates)
-    .set(params)
-    .where(eq(schema.templates.id, params.id))
+    .set(rest)
+    .where(eq(schema.templates.id, id))
     .returning();
   return template;
 };
 
 export const resetTemplate = async (templateId: string) => {
   const db = await getDB();
-  const [template] = await db
-    .select()
-    .from(schema.templates)
-    .where(eq(schema.templates.id, templateId));
-
+  const template = await getTemplateById(templateId);
   if (!template || !template.originalTemplate) {
     throw new Error("Template not found");
   }
-  const original = template.originalTemplate as NewTemplateParams;
+
   const [updated] = await db
     .update(schema.templates)
-    .set(original)
-    .where(eq(schema.templates.id, templateId))
+    .set(template.originalTemplate)
+    .where(eq(schema.templates.id, template.id))
     .returning();
   return toTemplate(updated);
 };

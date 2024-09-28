@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight, MoreVertical, Edit, RotateCcw } from "lucide-react";
-import { Template } from "@/models/template";
+import { iconMap, Template } from "@/models/template";
 import { useState } from "react";
 import { useCreateThreadMutation } from "@/services/threads/mutations";
 import { useNavigate } from "react-router-dom";
@@ -108,12 +108,14 @@ export const TemplateCard = ({ template }: TemplateCardProps) => {
     resetTemplate(template.id, {
       onSuccess: () => {
         toast({
-          title: t("templateCard.resetSuccess"),
+          variant: "info",
+          description: t("templateCard.resetSuccess"),
         });
       },
-      onError: () => {
+      onError: (e) => {
         toast({
           title: t("templateCard.resetError"),
+          description: e.message,
           variant: "destructive",
         });
       },
@@ -143,7 +145,7 @@ export const TemplateCard = ({ template }: TemplateCardProps) => {
       </div>
       <CardHeader>
         <div className="flex items-center space-x-4">
-          {template.icon}
+          {iconMap[template.icon as keyof typeof iconMap]}
           <CardTitle className="text-xl font-semibold text-gray-800">
             {template.title}
           </CardTitle>

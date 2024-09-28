@@ -1,5 +1,4 @@
 import { schema } from "@/lib/database/schema";
-import { ReactNode } from "react";
 import {
   Activity,
   Stethoscope,
@@ -24,7 +23,7 @@ type BaseTemplate = {
   title: string;
   overview: string;
   description: string;
-  icon: ReactNode;
+  icon: string;
   systemMessage: string;
   initialAssistantMessage: string;
   reportGenerationPrompt?: string;
@@ -47,24 +46,26 @@ type Template = ReportTemplate | SummaryTemplate | ConsultationTemplate;
 
 type DatabaseTemplate = typeof schema.templates.$inferSelect;
 
+const templateSchema = z.object({
+  type: z.enum(["report", "summary", "consultation"]),
+  title: z.string(),
+  overview: z.string(),
+  description: z.string(),
+  systemMessage: z.string(),
+  initialAssistantMessage: z.string(),
+  icon: z.string(),
+  reportGenerationPrompt: z.string().optional(),
+});
+
 function toTemplate(data: DatabaseTemplate): Template {
-  const parsed = z
-    .object({
-      type: z.enum(["report", "summary", "consultation"]),
-      title: z.string(),
-      overview: z.string(),
-      description: z.string(),
-      systemMessage: z.string(),
-      initialAssistantMessage: z.string(),
-      icon: z.string(),
-      reportGenerationPrompt: z.string().optional(),
-    })
-    .safeParse(data.originalTemplate);
+  const parsed = templateSchema.safeParse(
+    JSON.parse(data.originalTemplate as string)
+  );
   switch (data.type) {
     case "report":
       return {
         ...data,
-        icon: iconMap[data.icon as keyof typeof iconMap],
+        icon: data.icon,
         type: "report" as const,
         reportGenerationPrompt: data.reportGenerationPrompt ?? "",
         originalTemplate: parsed.success ? parsed.data : undefined,
@@ -72,7 +73,7 @@ function toTemplate(data: DatabaseTemplate): Template {
     case "summary":
       return {
         ...data,
-        icon: iconMap[data.icon as keyof typeof iconMap],
+        icon: data.icon,
         type: "summary" as const,
         reportGenerationPrompt: data.reportGenerationPrompt ?? "",
         originalTemplate: parsed.success ? parsed.data : undefined,
@@ -80,7 +81,7 @@ function toTemplate(data: DatabaseTemplate): Template {
     case "consultation":
       return {
         ...data,
-        icon: iconMap[data.icon as keyof typeof iconMap],
+        icon: data.icon,
         type: "consultation" as const,
         reportGenerationPrompt: data.reportGenerationPrompt ?? "",
         originalTemplate: parsed.success ? parsed.data : undefined,
@@ -115,7 +116,7 @@ type NewTemplateParams =
   | NewReportTemplateParams
   | NewSummaryTemplateParams;
 
-export { toTemplate };
+export { toTemplate, iconMap };
 export type {
   ReportTemplate,
   SummaryTemplate,
