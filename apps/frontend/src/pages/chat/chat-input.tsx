@@ -1,9 +1,8 @@
 import { FileIcon, PenSquareIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useChatContext } from "@/pages/chat/context";
 import { UsageTooltip } from "@/components/usage-tooltip";
-
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { useTranslation } from "react-i18next";
 import { useMessageCreateMutation } from "@/services/messages/mutations";
@@ -17,34 +16,46 @@ export function ChatInput() {
   const { user } = useAuthenticator((context) => [context.user]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { mutateAsync: saveMessage } = useMessageCreateMutation();
-  useEffect(() => {
+
+  const calculateRows = useCallback(() => {
     if (textareaRef.current) {
       const lineHeight = 30;
-      const maxWidth = textareaRef.current.clientWidth;
-      const fontSize = 16;
-      const ratio = (textareaRef.current.clientWidth / window.innerWidth) * 0.9;
-      const charsPerLine = Math.floor(maxWidth / (fontSize * ratio));
-      const lines =
-        charsPerLine === 0
-          ? 1
-          : chatHook.input.split("\n").reduce((acc, line) => {
-              return acc + Math.ceil(line.length / charsPerLine);
-            }, 0);
-      const newRows = Math.min(10, Math.max(1, lines));
-      setRows(newRows);
-      textareaRef.current.style.height = `${newRows * lineHeight}px`;
+      const maxLines = 10;
+      const charsPerLine = Math.floor(textareaRef.current.clientWidth / 16); // Assuming avg font width
+      const lines = chatHook.input
+        .split("\n")
+        .reduce((total, line) => total + Math.ceil(line.length / charsPerLine), 0);
+      setRows(Math.min(maxLines, Math.max(1, lines)));
+      textareaRef.current.style.height = `${Math.min(maxLines, Math.max(1, lines)) * lineHeight}px`;
     }
-  }, [chatHook.input, window.innerWidth]);
+  }, [chatHook.input]);
+
+  useEffect(() => {
+    calculateRows();
+  }, [chatHook.input, calculateRows]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      calculateRows();
+    };
+
+    const resizeDebounce = setTimeout(() => {
+      window.addEventListener("resize", handleResize);
+    }, 300); // Debounced resize
+
+    return () => {
+      clearTimeout(resizeDebounce);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [calculateRows]);
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     chatHook.handleInputChange(e);
   };
 
   const submitMessage = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (!user) {
-      return;
-    }
-    if (chatHook.input.length <= 0) return;
+    if (!user || chatHook.input.length <= 0) return;
+
     await saveMessage({
       role: "user",
       content: chatHook.input,
@@ -101,7 +112,6 @@ export function ChatInput() {
             }}
             value={chatHook.input}
             tabIndex={0}
-            cols={100}
             rows={rows}
           />
           <button type="submit" id="chat-submit" className="hidden"></button>
