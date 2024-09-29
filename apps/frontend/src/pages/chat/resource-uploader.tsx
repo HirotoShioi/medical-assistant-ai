@@ -19,10 +19,10 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
-export default function DocumentUploader() {
+export default function ResourceUploader() {
   const {
-    isDocumentUploaderOpen,
-    setIsDocumentUploaderOpen,
+    isResourceUploaderOpen: isDocumentUploaderOpen,
+    setIsResourceUploaderOpen: setIsDocumentUploaderOpen,
     usage,
     uploadFiles,
     uploadText: uploadTextMutation,

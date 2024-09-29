@@ -1,6 +1,6 @@
 import { generateEmbedding } from "@/lib/ai/embeddings";
-import { NewDocumentParams } from "@/models";
-import { insertDocumentSchema } from "@/lib/database/schema";
+import { NewResourceParams } from "@/models";
+import { insertResourceSchema } from "@/lib/database/schema";
 import { schema } from "@/lib/database/schema";
 import { getDB } from "@/lib/database/client";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
@@ -47,14 +47,14 @@ async function generateChunks(input: string): Promise<string[]> {
   return chunks.map((chunk) => chunk.pageContent);
 }
 
-export const embedDocument = async (input: NewDocumentParams) => {
+export const embedResource = async (input: NewResourceParams) => {
   const db = await getDB();
   try {
     const { content, threadId, title, fileType } =
-      insertDocumentSchema.parse(input);
+      insertResourceSchema.parse(input);
     const chunks = await generateChunks(content);
     const [document] = await db
-      .insert(schema.documents)
+      .insert(schema.resources)
       .values({
         content: content,
         threadId: threadId,
@@ -74,26 +74,26 @@ export const embedDocument = async (input: NewDocumentParams) => {
         });
       })
     );
-    return "Document successfully created.";
+    return "Resource successfully created.";
   } catch (e) {
     if (e instanceof Error)
       return e.message.length > 0 ? e.message : "Error, please try again.";
   }
 };
 
-export async function deleteDocumentById(id: string) {
+export async function deleteResourceById(id: string) {
   const db = await getDB();
-  await db.delete(schema.documents).where(eq(schema.documents.id, id));
+  await db.delete(schema.resources).where(eq(schema.resources.id, id));
   await db
     .delete(schema.embeddings)
-    .where(eq(schema.embeddings.documentId, id));
+    .where(eq(schema.embeddings.resourceId, id));
 }
 
-export const getDocumentsByThreadId = async (threadId: string) => {
+export const getResourcesByThreadId = async (threadId: string) => {
   const db = await getDB();
   return db
     .select()
-    .from(schema.documents)
-    .where(eq(schema.documents.threadId, threadId))
-    .orderBy(desc(schema.documents.createdAt));
+    .from(schema.resources)
+    .where(eq(schema.resources.threadId, threadId))
+    .orderBy(desc(schema.resources.createdAt));
 };

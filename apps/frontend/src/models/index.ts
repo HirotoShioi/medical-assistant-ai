@@ -1,6 +1,6 @@
 import {
   schema,
-  insertDocumentSchema,
+  insertResourceSchema,
   insertMessageSchema,
   insertThreadSettingsSchema,
 } from "@/lib/database/schema";
@@ -10,8 +10,8 @@ import type { Template } from "./template";
 type Thread = typeof schema.threads.$inferSelect;
 type Embedding = typeof schema.embeddings.$inferSelect;
 type Message = typeof schema.messages.$inferSelect;
-type NewDocumentParams = z.infer<typeof insertDocumentSchema>;
-type Document = typeof schema.documents.$inferSelect;
+type NewResourceParams = z.infer<typeof insertResourceSchema>;
+type Resource = typeof schema.resources.$inferSelect;
 type DatabaseTemplate = typeof schema.templates.$inferSelect;
 type NewMessageParams = z.infer<typeof insertMessageSchema>;
 type ThreadSettings = typeof schema.threadSettings.$inferSelect;
@@ -19,8 +19,8 @@ type NewThreadSettingsParams = z.infer<typeof insertThreadSettingsSchema>;
 
 export type {
   NewMessageParams,
-  NewDocumentParams,
-  Document,
+  NewResourceParams,
+  Resource,
   Message,
   Thread,
   Embedding,

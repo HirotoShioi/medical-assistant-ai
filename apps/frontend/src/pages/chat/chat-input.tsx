@@ -11,8 +11,12 @@ import { Tooltip } from "@/components/tooltip";
 import { useAlert } from "@/components/alert";
 
 function ChatInput() {
-  const { chatHook, usage, setIsDocumentUploaderOpen, isLoading } =
-    useChatContext();
+  const {
+    chatHook,
+    usage,
+    setIsResourceUploaderOpen: setIsDocumentUploaderOpen,
+    isLoading,
+  } = useChatContext();
   const [isFocused, setIsFocused] = useState(false);
 
   return (

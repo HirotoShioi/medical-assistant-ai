@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { Message } from "ai/react";
 import { useChat } from "@/hooks/use-chat";
-import { Document, Thread, ThreadSettings } from "@/models";
+import { Resource, Thread, ThreadSettings } from "@/models";
 import { useAlert } from "@/components/alert";
 import { useAutoScroll } from "@/hooks/use-auto-scroll";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -13,7 +13,7 @@ import { nanoid } from "nanoid";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { convertTextToMarkdown } from "@/lib/ai/convert-text-to-markdown";
-import { embedDocument } from "@/services/documents/service";
+import { embedResource } from "@/services/resources/service";
 import { GeneratePatientReferralDocument } from "@/services/ai/document-generator/generate-patient-referral-document";
 
 export type PanelState = "closed" | "list" | "detail";
@@ -22,12 +22,12 @@ interface ChatContextType {
   chatHook: ReturnType<typeof useChat>;
   panelState: PanelState;
   setPanelState: React.Dispatch<React.SetStateAction<PanelState>>;
-  documents: Document[];
+  resources: Resource[];
   scrollRef: (element: HTMLDivElement | null) => void;
   scrollToEnd: () => void;
-  isDocumentUploaderOpen: boolean;
-  setIsDocumentUploaderOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  isUploadingDocuments: boolean;
+  isResourceUploaderOpen: boolean;
+  setIsResourceUploaderOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isUploadingResources: boolean;
   isSmallScreen: boolean;
   thread: Thread;
   threadSettings: ThreadSettings;
@@ -45,7 +45,7 @@ export type ChatContextProviderProps = {
   children: React.ReactNode;
   thread: Thread;
   messages: Message[];
-  documents: Document[];
+  documents: Resource[];
   usage: Usage;
   threadSettings: ThreadSettings;
 };
@@ -53,13 +53,13 @@ export function ChatContextProvider({
   children,
   thread,
   messages,
-  documents,
+  documents: resources,
   usage,
   threadSettings,
 }: ChatContextProviderProps) {
   const { openAlert } = useAlert();
   const isSmallScreen = useMediaQuery("(max-width: 1200px)");
-  const [isDocumentUploaderOpen, setIsDocumentUploaderOpen] = useState(false);
+  const [isResourceUploaderOpen, setIsResourceUploaderOpen] = useState(false);
   const { ref: scrollRef, scrollToEnd } = useAutoScroll();
   const chatHook = useChat(thread.id, messages);
   const { user } = useAuthenticator((u) => [u.user]);
@@ -74,7 +74,7 @@ export function ChatContextProvider({
     if (!user) {
       return;
     }
-    setIsDocumentUploaderOpen(false);
+    setIsResourceUploaderOpen(false);
     if (acceptedFiles.length <= 0) {
       return;
     }
@@ -93,7 +93,7 @@ export function ChatContextProvider({
     const fileWithText = await Promise.all(
       acceptedFiles.map(async (file) => {
         const { content, fileType } = await parseFile(file, file.type);
-        await embedDocument({
+        await embedResource({
           threadId: thread.id,
           content,
           title: file.name,
@@ -143,7 +143,7 @@ export function ChatContextProvider({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["documents", { threadId: thread.id }],
+        queryKey: ["resources", { threadId: thread.id }],
       });
     },
   });
@@ -157,7 +157,7 @@ export function ChatContextProvider({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["documents", { threadId: thread.id }],
+        queryKey: ["resources", { threadId: thread.id }],
       });
     },
     onSettled: () => {
@@ -210,12 +210,12 @@ export function ChatContextProvider({
         panelState,
         setPanelState,
         isSmallScreen,
-        documents,
+        resources,
         scrollRef,
         scrollToEnd,
-        isDocumentUploaderOpen,
-        setIsDocumentUploaderOpen,
-        isUploadingDocuments:
+        isResourceUploaderOpen,
+        setIsResourceUploaderOpen,
+        isUploadingResources:
           uploadFilesMutation.isPending || uploadText.isPending,
         isLoading:
           chatHook.isLoading ||

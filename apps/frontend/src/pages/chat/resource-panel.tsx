@@ -1,26 +1,26 @@
 import { XIcon, FileIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Document } from "@/models";
+import type { Resource } from "@/models";
 import { useMemo, useState } from "react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Markdown } from "@/components/markdown";
-import DocumentUploader from "./document-uploader";
+import ResourceUploader from "./resource-uploader";
 import { useChatContext } from "@/pages/chat/context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { useTranslation } from "react-i18next";
-import { useDocumentDeleteMutation } from "@/services/documents/mutations";
+import { useResourceDeleteMutation } from "@/services/resources/mutations";
 import { useToast } from "@/hooks/use-toast";
 
-function DocumentItem({
+function ResourceItem({
   document,
   onSelect,
 }: {
-  document: Document;
-  onSelect: (document: Document) => void;
+  document: Resource;
+  onSelect: (document: Resource) => void;
 }) {
-  const deleteDocument = useDocumentDeleteMutation();
+  const deleteDocument = useResourceDeleteMutation();
   const { toast } = useToast();
   const { t } = useTranslation();
   async function handleDelete(e: React.MouseEvent<HTMLButtonElement>) {
@@ -64,7 +64,7 @@ function DocumentItem({
   );
 }
 
-function DocumentItemSkeleton() {
+function ResourceItemSkeleton() {
   return (
     <div className="flex items-center p-2 bg-white rounded-lg shadow-md border w-full">
       <Skeleton className="w-10 h-10 rounded-lg mr-3" />
@@ -74,12 +74,12 @@ function DocumentItemSkeleton() {
   );
 }
 
-function DocumentList({
+function ResourceList({
   documents,
   onSelect,
 }: {
-  documents: Document[];
-  onSelect: (document: Document) => void;
+  documents: Resource[];
+  onSelect: (document: Resource) => void;
 }) {
   const { t } = useTranslation();
   if (documents.length === 0) {
@@ -96,23 +96,23 @@ function DocumentList({
   return (
     <div className="flex flex-col gap-2 w-full px-4">
       {documents.map((document, index) => (
-        <DocumentItem key={index} document={document} onSelect={onSelect} />
+        <ResourceItem key={index} document={document} onSelect={onSelect} />
       ))}
     </div>
   );
 }
 
-function DocumentListSkeleton() {
+function ResourceListSkeleton() {
   return (
     <div className="flex flex-col gap-2 w-full px-4">
       {[...Array(5)].map((_, index) => (
-        <DocumentItemSkeleton key={index} />
+        <ResourceItemSkeleton key={index} />
       ))}
     </div>
   );
 }
 
-function Documents({ document }: { document: Document }) {
+function Resources({ document }: { document: Resource }) {
   const rendered = useMemo(() => {
     switch (document.fileType) {
       case "text/plain":
@@ -136,11 +136,11 @@ function Documents({ document }: { document: Document }) {
   );
 }
 
-function DocumentHeader({
+function Header({
   document,
   onClose,
 }: {
-  document: Document | null;
+  document: Resource | null;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
@@ -155,7 +155,7 @@ function DocumentHeader({
             <h2 className="text-lg font-semibold">
               {t("documentPanel.documents")}
             </h2>
-            <DocumentUploader />
+            <ResourceUploader />
           </div>
         </div>
       </div>
@@ -181,16 +181,16 @@ function DocumentHeader({
   );
 }
 
-export function DocumentPanel() {
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
+export function ResourcePanel() {
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(
     null
   );
   const {
     panelState,
     setPanelState,
-    documents,
+    resources: documents,
     isSmallScreen,
-    isUploadingDocuments,
+    isUploadingResources: isUploadingDocuments,
   } = useChatContext();
 
   const panelWidth = isSmallScreen
@@ -199,14 +199,14 @@ export function DocumentPanel() {
     ? "700px"
     : "300px";
 
-  function setDocument(document: Document) {
-    setSelectedDocument(document);
+  function setResource(document: Resource) {
+    setSelectedResource(document);
     setPanelState("detail");
   }
 
   const handleClose = () => {
-    if (selectedDocument) {
-      setSelectedDocument(null);
+    if (selectedResource) {
+      setSelectedResource(null);
       setPanelState("list");
     } else {
       setPanelState("closed");
@@ -225,15 +225,15 @@ export function DocumentPanel() {
         style={{ width: panelWidth }}
       >
         <div className="flex flex-col gap-4">
-          <DocumentHeader document={selectedDocument} onClose={handleClose} />
+          <Header document={selectedResource} onClose={handleClose} />
           <div className="overflow-hidden">
             <div className="w-full overflow-y-auto h-full">
               {isUploadingDocuments ? (
-                <DocumentListSkeleton />
-              ) : selectedDocument ? (
-                <Documents document={selectedDocument} />
+                <ResourceListSkeleton />
+              ) : selectedResource ? (
+                <Resources document={selectedResource} />
               ) : (
-                <DocumentList documents={documents} onSelect={setDocument} />
+                <ResourceList documents={documents} onSelect={setResource} />
               )}
             </div>
           </div>

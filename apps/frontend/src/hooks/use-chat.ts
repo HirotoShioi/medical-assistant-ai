@@ -8,7 +8,7 @@ import { BASE_MODEL } from "@/constants";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
-import { getDocumentsByThreadId } from "@/services/documents/service";
+import { getResourcesByThreadId } from "@/services/resources/service";
 import { generateDocument as generateDocument } from "@/lib/ai/generate-document";
 import { ThreadSettings } from "@/models";
 
@@ -127,7 +127,7 @@ function generateDocumentTool(threadId: string, settings: ThreadSettings) {
     execute: async () => {
       const [messages, documents] = await Promise.all([
         getMessagesByThreadId(threadId),
-        getDocumentsByThreadId(threadId),
+        getResourcesByThreadId(threadId),
       ]);
       return generateDocument({
         documentGenerationPrompt: settings.reportGenerationPrompt ?? undefined,

@@ -4,7 +4,7 @@
 import { ThreadSettings } from "@/models";
 import { DocumentGenerator } from "./base";
 import { getMessagesByThreadId } from "@/services/messages/services";
-import { getDocumentsByThreadId } from "@/services/documents/service";
+import { getResourcesByThreadId } from "@/services/resources/service";
 import { generateDocument as gen } from "@/lib/ai/generate-document";
 // 1. 既往歴 <- 入院時のカルテから
 // 入院の経緯 <- 入院時のカルテから
@@ -35,7 +35,7 @@ export class GeneratePatientReferralDocument implements DocumentGenerator {
   ): Promise<string> {
     const [messages, documents] = await Promise.all([
       getMessagesByThreadId(threadId),
-      getDocumentsByThreadId(threadId),
+      getResourcesByThreadId(threadId),
     ]);
     return gen({
       documentGenerationPrompt: settings.reportGenerationPrompt ?? undefined,

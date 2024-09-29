@@ -1,7 +1,7 @@
 import { BASE_MODEL } from "@/constants";
 import { getModel } from "./model";
 import { Message } from "ai/react";
-import { Document } from "@/models";
+import { Resource } from "@/models";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { codeBlock } from "common-tags";
 import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -10,7 +10,7 @@ import { z } from "zod";
 type GenerateDocumentParams = {
   documentGenerationPrompt?: string;
   messages: Message[];
-  documents: Document[];
+  documents: Resource[];
 };
 
 export async function generateDocument({
@@ -95,7 +95,7 @@ async function extractRequests(messages: Message[]) {
 }
 
 // 会話履歴から、不要な情報を削除する
-async function cleanseData(messages: Message[], documents: Document[]) {
+async function cleanseData(messages: Message[], documents: Resource[]) {
   const model = await getModel({
     model: BASE_MODEL,
     temperature: 0,
@@ -129,7 +129,7 @@ async function cleanseData(messages: Message[], documents: Document[]) {
   // **Title** \n
   // - 内容 \n
   // となるように整形する
-  const concatDocuments = (documents: Document[]) => {
+  const concatDocuments = (documents: Resource[]) => {
     return documents.map((d) => `**${d.title}** \n\n ${d.content}`).join("\n");
   };
 

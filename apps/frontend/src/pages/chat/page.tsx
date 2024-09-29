@@ -2,13 +2,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ChatMessage from "./chat-message";
 import ChatInput from "./chat-input";
-import { DocumentPanel } from "./document-panel";
+import { ResourcePanel } from "./resource-panel";
 import { ChatContextProvider, useChatContext } from "@/pages/chat/context";
 import React from "react";
 import { ChatTitle } from "./chat-title";
 import { useUsageQuery } from "@/services/usage/queries";
 import { useMessagesQuery } from "@/services/messages/queries";
-import { useDocumentsQuery } from "@/services/documents/queries";
+import { useResourcesQuery } from "@/services/resources/queries";
 import { FullPageLoader } from "@/components/fulll-page-loader";
 import { useTranslation } from "react-i18next";
 import {
@@ -18,7 +18,7 @@ import {
 import { useDropzone } from "react-dropzone";
 import { Loader2 } from "lucide-react";
 
-const Document = React.memo(DocumentPanel);
+const Document = React.memo(ResourcePanel);
 
 function ChatContainer({ children }: { children: React.ReactNode }) {
   return (
@@ -71,7 +71,7 @@ function ChatPageContent() {
     isSmallScreen,
     uploadFiles,
     isGeneratingDocument,
-    isDocumentUploaderOpen,
+    isResourceUploaderOpen: isDocumentUploaderOpen,
   } = useChatContext();
   const [isDragging, setIsDragging] = useState(false);
 
@@ -141,7 +141,7 @@ export default function ChatPage() {
   const threadQuery = useThreadQuery(params.threadId!);
   const usageQuery = useUsageQuery();
   const messagesQuery = useMessagesQuery(threadQuery.data?.id);
-  const documentQuery = useDocumentsQuery(threadQuery.data?.id);
+  const documentQuery = useResourcesQuery(threadQuery.data?.id);
   const threadSettingsQuery = useThreadSettingsQuery(threadQuery.data?.id);
   if (
     !usageQuery.data ||

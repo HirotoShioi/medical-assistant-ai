@@ -12,7 +12,7 @@ import {
 import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-const documents = pgTable("documents", {
+const resources = pgTable("resources", {
   id: varchar("id", { length: MAX_VARCHAR_LENGTH })
     .primaryKey()
     .$defaultFn(() => nanoid()),
@@ -31,7 +31,7 @@ const documents = pgTable("documents", {
 });
 
 // Schema for documents - used to validate API requests
-const insertDocumentSchema = createSelectSchema(documents).omit({
+const insertResourceSchema = createSelectSchema(resources).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -43,9 +43,9 @@ const embeddings = pgTable(
     id: varchar("id", { length: MAX_VARCHAR_LENGTH })
       .primaryKey()
       .$defaultFn(() => nanoid()),
-    documentId: varchar("document_id", {
+    resourceId: varchar("resource_id", {
       length: MAX_VARCHAR_LENGTH,
-    }).references(() => documents.id, { onDelete: "cascade" }),
+    }).references(() => resources.id, { onDelete: "cascade" }),
     threadId: varchar("thread_id", { length: MAX_VARCHAR_LENGTH }).notNull(),
     content: text("content").notNull(),
     embedding: vector("embedding", {
@@ -169,14 +169,14 @@ const insertThreadSettingsSchema = createInsertSchema(threadSettings).omit({
 export const schema = {
   embeddings,
   messages,
-  documents,
+  resources,
   threads,
   templates,
   threadSettings,
 };
 
 export {
-  insertDocumentSchema,
+  insertResourceSchema,
   insertMessageSchema,
   insertTemplateSchema,
   insertThreadSettingsSchema,
