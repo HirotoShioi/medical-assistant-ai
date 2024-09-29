@@ -4,7 +4,7 @@ import { saveMessage } from "@/services/messages";
 import { createOpenAI } from "@ai-sdk/openai";
 import { z } from "zod";
 import { findRelevantContent } from "@/lib/ai/embeddings";
-import { BASE_CHAT_MODEL } from "@/constants";
+import { BASE_MODEL } from "@/constants";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
@@ -61,7 +61,7 @@ async function handleChat(req: Request) {
   const model = createOpenAI({
     apiKey: session.tokens.idToken.toString(),
     baseURL: import.meta.env.VITE_API_URL,
-  }).chat(BASE_CHAT_MODEL);
+  }).chat(BASE_MODEL);
   const result = await streamText({
     model: model,
     system: settings.systemMessage,

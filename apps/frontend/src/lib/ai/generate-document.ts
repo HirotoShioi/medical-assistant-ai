@@ -1,4 +1,4 @@
-import { BASE_CHAT_MODEL } from "@/constants";
+import { BASE_MODEL } from "@/constants";
 import { getModel } from "./model";
 import { Message } from "ai/react";
 import { Document } from "@/models";
@@ -23,16 +23,18 @@ export async function generateDocument({
     extractRequests(messages),
   ]);
   const model = await getModel({
-    model: BASE_CHAT_MODEL,
+    model: BASE_MODEL,
     temperature: 0,
   });
-  const instructions = documentGenerationPrompt ?? codeBlock`
+  const instructions =
+    documentGenerationPrompt ??
+    codeBlock`
     Focus on key medical information, including but not limited to:
     - Patient's symptoms
     - Diagnosis
     - Treatment recommendations
     - Relevant medical history
-    - Lab results`
+    - Lab results`;
 
   const template = PromptTemplate.fromTemplate(codeBlock`
     You are a medical report generation specialist specialized in generating medical reports. Your task is to create a concise report based **only** on the data provided below. Do not include any information that is not present in the data. Avoid any assumptions or fabrications.
@@ -55,13 +57,17 @@ export async function generateDocument({
   return template
     .pipe(model)
     .pipe(new StringOutputParser())
-    .invoke({ data: cleanedData, requests: requests?.join("\n") ?? "", instructions });
+    .invoke({
+      data: cleanedData,
+      requests: requests?.join("\n") ?? "",
+      instructions,
+    });
 }
 
 // 会話履歴から、ユーザーのリクエストを抽出する
 async function extractRequests(messages: Message[]) {
   const model = await getModel({
-    model: BASE_CHAT_MODEL,
+    model: BASE_MODEL,
     temperature: 0,
   });
   const schema = z.object({
@@ -91,7 +97,7 @@ async function extractRequests(messages: Message[]) {
 // 会話履歴から、不要な情報を削除する
 async function cleanseData(messages: Message[], documents: Document[]) {
   const model = await getModel({
-    model: BASE_CHAT_MODEL,
+    model: BASE_MODEL,
     temperature: 0,
   });
   const template = PromptTemplate.fromTemplate(codeBlock`

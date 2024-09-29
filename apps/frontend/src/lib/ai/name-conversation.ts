@@ -1,7 +1,7 @@
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { getModel } from "./model";
-import { BASE_CHAT_MODEL } from "@/constants";
+import { BASE_MODEL } from "@/constants";
 
 /**
  * Names a conversation.
@@ -10,7 +10,7 @@ import { BASE_CHAT_MODEL } from "@/constants";
  */
 export async function nameConversation(message: string): Promise<string> {
   const model = await getModel({
-    model: BASE_CHAT_MODEL,
+    model: BASE_MODEL,
     temperature: 0.5,
   });
   const messages = [
