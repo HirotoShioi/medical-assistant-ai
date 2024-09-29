@@ -28,7 +28,7 @@ function DocumentItem({
       onSuccess: () => {
         toast({
           title: "Document deleted",
-          variant: "success",
+          variant: "info",
           description: "The document has been successfully deleted.",
         });
       },
@@ -195,8 +195,8 @@ export function DocumentPanel() {
   const panelWidth = isSmallScreen
     ? "100%"
     : panelState === "detail"
-      ? "700px"
-      : "300px";
+    ? "700px"
+    : "300px";
 
   function setDocument(document: Document) {
     setSelectedDocument(document);

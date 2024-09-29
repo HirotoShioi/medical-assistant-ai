@@ -65,7 +65,7 @@
     "searchingInformation": "Searching information",
     "embeddingDocuments": "Embedding documents",
     "processing": "Processing...",
-    "generatingDocument": "Generating document... (this may take a while)"
+    "generatingDocument": "Generating document"
   },
   "documentUploader": {
     "dropFiles": "Drop files here",
@@ -84,7 +84,8 @@
   "page": {
     "loading": "Loading messages and documents...",
     "loadingThread": "Loading thread...",
-    "loadingData": "Loading data..."
+    "loadingData": "Loading data...",
+    "generatingDocument": "Generating document<br>Please wait a moment"
   },
   "file": {
     "fileSizeIsTooLarge": "File size is too large",
@@ -124,5 +125,5 @@
     "reportGenerationPromptLabel": "Report Generation Prompt",
     "reportGenerationPromptDescription": "Enter the prompt for the AI to generate a report.",
     "reportGenerationPromptPlaceholder": "Enter the prompt for the AI to generate a report."
-  } 
+  }
 }

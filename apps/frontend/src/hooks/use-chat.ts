@@ -122,7 +122,7 @@ function embedDocumentTool() {
 function generateDocumentTool(threadId: string, settings: ThreadSettings) {
   return tool({
     description:
-      "Generate a document from the chat and documents. If user asks for any kind of report or document, use this tool.",
+      "Generate a document from the chat and documents. Do not call this tool directly, it is used internally by the system.",
     parameters: z.object({}),
     execute: async () => {
       const [messages, documents] = await Promise.all([

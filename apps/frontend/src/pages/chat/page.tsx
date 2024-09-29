@@ -11,8 +11,12 @@ import { useMessagesQuery } from "@/services/messages/queries";
 import { useDocumentsQuery } from "@/services/documents/queries";
 import { FullPageLoader } from "@/components/fulll-page-loader";
 import { useTranslation } from "react-i18next";
-import { useThreadQuery } from "@/services/threads/queries";
+import {
+  useThreadQuery,
+  useThreadSettingsQuery,
+} from "@/services/threads/queries";
 import { useDropzone } from "react-dropzone";
+import { Loader2 } from "lucide-react";
 
 const Document = React.memo(DocumentPanel);
 
@@ -34,6 +38,31 @@ function FileUploadOverlay() {
   );
 }
 
+function DocumentGeneratorLoaderOverlay() {
+  const { t } = useTranslation();
+  const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prevDots) => (prevDots.length >= 3 ? "" : prevDots + "."));
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center text-center bg-white/80 backdrop-filter backdrop-blur-sm transition-all duration-300 ease-in-out z-50 gap-4">
+      <Loader2 className="w-10 h-10 animate-spin" />
+      <div className="text-sm text-gray-500">
+        <span
+          dangerouslySetInnerHTML={{ __html: t("page.generatingDocument") }}
+        ></span>
+        <span className="inline-block w-8 text-left">{dots}</span>
+      </div>
+    </div>
+  );
+}
+
 function ChatPageContent() {
   const {
     chatHook,
@@ -41,6 +70,7 @@ function ChatPageContent() {
     scrollToEnd,
     isSmallScreen,
     uploadFiles,
+    isGeneratingDocument,
     isDocumentUploaderOpen,
   } = useChatContext();
   const [isDragging, setIsDragging] = useState(false);
@@ -77,9 +107,10 @@ function ChatPageContent() {
       <input {...getInputProps()} />
       {isDragging && <FileUploadOverlay />}
       {!isSmallScreen && <Document />}
+      {isGeneratingDocument && <DocumentGeneratorLoaderOverlay />}
       <div className="w-full h-full flex flex-col">
         <ChatTitle />
-        <div className="flex-grow overflow-hidden flex flex-col">
+        <div className="flex-grow overflow-hidden flex flex-col relative">
           <div className="flex-grow overflow-y-auto" ref={scrollRef}>
             <div className="mx-auto">
               {chatHook.messages.map((message, i) => (
@@ -111,7 +142,13 @@ export default function ChatPage() {
   const usageQuery = useUsageQuery();
   const messagesQuery = useMessagesQuery(threadQuery.data?.id);
   const documentQuery = useDocumentsQuery(threadQuery.data?.id);
-  if (!usageQuery.data || !messagesQuery.data || !documentQuery.data) {
+  const threadSettingsQuery = useThreadSettingsQuery(threadQuery.data?.id);
+  if (
+    !usageQuery.data ||
+    !messagesQuery.data ||
+    !documentQuery.data ||
+    !threadSettingsQuery.data
+  ) {
     return <FullPageLoader label={t("page.loading")} />;
   }
   if (threadQuery.data === null) {
@@ -124,6 +161,7 @@ export default function ChatPage() {
       messages={messagesQuery.data}
       documents={documentQuery.data}
       usage={usageQuery.data}
+      threadSettings={threadSettingsQuery.data}
     >
       <ChatPageContent />
     </ChatContextProvider>

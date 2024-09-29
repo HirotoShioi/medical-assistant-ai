@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { Message } from "ai/react";
 import { useChat } from "@/hooks/use-chat";
-import { Document, Thread } from "@/models";
+import { Document, Thread, ThreadSettings } from "@/models";
 import { useAlert } from "@/components/alert";
 import { useAutoScroll } from "@/hooks/use-auto-scroll";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -14,6 +14,7 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { convertTextToMarkdown } from "@/lib/ai/convert-text-to-markdown";
 import { embedDocument } from "@/services/documents/service";
+import { GeneratePatientReferralDocument } from "@/services/ai/document-generator/generate-patient-referral-document";
 
 export type PanelState = "closed" | "list" | "detail";
 
@@ -29,9 +30,13 @@ interface ChatContextType {
   isUploadingDocuments: boolean;
   isSmallScreen: boolean;
   thread: Thread;
+  threadSettings: ThreadSettings;
+  isLoading: boolean;
+  isGeneratingDocument: boolean;
   usage: Usage;
   uploadFiles: (acceptedFiles: File[]) => Promise<void>;
   uploadText: (text: string) => Promise<void>;
+  generateDocument: () => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -42,6 +47,7 @@ export type ChatContextProviderProps = {
   messages: Message[];
   documents: Document[];
   usage: Usage;
+  threadSettings: ThreadSettings;
 };
 export function ChatContextProvider({
   children,
@@ -49,6 +55,7 @@ export function ChatContextProvider({
   messages,
   documents,
   usage,
+  threadSettings,
 }: ChatContextProviderProps) {
   const { openAlert } = useAlert();
   const isSmallScreen = useMediaQuery("(max-width: 1200px)");
@@ -86,14 +93,12 @@ export function ChatContextProvider({
     const fileWithText = await Promise.all(
       acceptedFiles.map(async (file) => {
         const { content, fileType } = await parseFile(file, file.type);
-        await embedDocument(
-          {
-            threadId: thread.id,
-            content,
-            title: file.name,
-            fileType,
-          },
-        )
+        await embedDocument({
+          threadId: thread.id,
+          content,
+          title: file.name,
+          fileType,
+        });
         return {
           text: content,
           file,
@@ -131,10 +136,12 @@ export function ChatContextProvider({
     mutationFn: async (acceptedFiles: File[]) => {
       return uploadFiles(acceptedFiles);
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: ["usage"],
       });
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["documents", { threadId: thread.id }],
       });
@@ -149,6 +156,45 @@ export function ChatContextProvider({
       return uploadFiles([file]);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["documents", { threadId: thread.id }],
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["usage"],
+      });
+    },
+  });
+
+  const generateDocument = useMutation({
+    mutationFn: async () => {
+      const result =
+        await new GeneratePatientReferralDocument().generateDocument(
+          thread.id,
+          threadSettings
+        );
+      const message: Message = {
+        id: nanoid(),
+        role: "assistant" as const,
+        content: "",
+        toolInvocations: [
+          {
+            state: "result" as const,
+            toolCallId: nanoid(),
+            toolName: "generateDocument",
+            args: {},
+            result: {
+              success: true,
+              fileId: nanoid(),
+              result: result,
+            },
+          },
+        ],
+      };
+      chatHook.append(message);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: ["usage"],
       });
@@ -169,10 +215,19 @@ export function ChatContextProvider({
         scrollToEnd,
         isDocumentUploaderOpen,
         setIsDocumentUploaderOpen,
-        isUploadingDocuments: uploadFilesMutation.isPending || uploadText.isPending,
+        isUploadingDocuments:
+          uploadFilesMutation.isPending || uploadText.isPending,
+        isLoading:
+          chatHook.isLoading ||
+          uploadFilesMutation.isPending ||
+          generateDocument.isPending ||
+          uploadText.isPending,
+        isGeneratingDocument: generateDocument.isPending,
         uploadFiles: uploadFilesMutation.mutateAsync,
         uploadText: uploadText.mutateAsync,
+        generateDocument: generateDocument.mutateAsync,
         thread,
+        threadSettings: threadSettings,
         usage,
       }}
     >

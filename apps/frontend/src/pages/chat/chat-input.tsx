@@ -11,7 +11,8 @@ import { Tooltip } from "@/components/tooltip";
 import { useAlert } from "@/components/alert";
 
 function ChatInput() {
-  const { chatHook, usage, setIsDocumentUploaderOpen } = useChatContext();
+  const { chatHook, usage, setIsDocumentUploaderOpen, isLoading } =
+    useChatContext();
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -29,7 +30,7 @@ function ChatInput() {
               className="p-2 rounded-lg h-8 w-8 border-0"
               onClick={() => setIsDocumentUploaderOpen(true)}
               size="icon"
-              disabled={usage.isZero}
+              disabled={isLoading || usage.isZero}
             >
               <FilePlus2 size={16} />
               <span className="sr-only">ファイルをアップロード</span>
@@ -64,7 +65,7 @@ function ChatInput() {
 }
 
 function DocumentGenerationButton() {
-  const { usage } = useChatContext();
+  const { usage, generateDocument, isLoading } = useChatContext();
   const { openAlert } = useAlert();
   function handleClick() {
     openAlert({
@@ -79,7 +80,7 @@ function DocumentGenerationButton() {
         },
         {
           label: "生成",
-          onClick: () => {},
+          onClick: generateDocument,
         },
       ],
     });
@@ -90,7 +91,7 @@ function DocumentGenerationButton() {
         className="mr-2 p-2 rounded-lg h-8 w-8 border-0"
         onClick={handleClick}
         size="icon"
-        disabled={usage.isZero}
+        disabled={isLoading || usage.isZero}
       >
         <ClipboardPlus size={16} />
         <span className="sr-only">ドキュメントを生成</span>
@@ -105,7 +106,7 @@ interface ChatInputFormProps {
 
 function ChatInputForm({ setIsFocused }: ChatInputFormProps) {
   const { t } = useTranslation();
-  const { chatHook, usage, thread, scrollToEnd } = useChatContext();
+  const { chatHook, usage, thread, scrollToEnd, isLoading } = useChatContext();
   const [isComposing, setIsComposing] = useState(false);
   const [rows, setRows] = useState(1);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -186,7 +187,7 @@ function ChatInputForm({ setIsFocused }: ChatInputFormProps) {
         style={{ minHeight: "20px" }}
         placeholder={t("chatInput.placeholder")}
         onChange={handleTextareaChange}
-        disabled={chatHook.isLoading || usage.isZero}
+        disabled={isLoading || usage.isZero}
         onCompositionStart={() => setIsComposing(true)}
         onCompositionEnd={() => setIsComposing(false)}
         onFocus={handleFocus}
