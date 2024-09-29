@@ -22,20 +22,21 @@ function DocumentItem({
 }) {
   const deleteDocument = useDocumentDeleteMutation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   async function handleDelete(e: React.MouseEvent<HTMLButtonElement>) {
     e.stopPropagation();
     deleteDocument.mutate(document.id, {
       onSuccess: () => {
         toast({
-          title: "Document deleted",
+          title: t("documentPanel.deleteSuccess"),
           variant: "info",
-          description: "The document has been successfully deleted.",
+          description: t("documentPanel.deleteSuccessDescription"),
         });
       },
       onError: () => {
         toast({
-          title: "Failed to delete document",
-          description: "Please try again.",
+          title: t("documentPanel.deleteError"),
+          description: t("documentPanel.deleteErrorDescription"),
         });
       },
     });

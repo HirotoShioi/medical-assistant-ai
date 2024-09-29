@@ -59,6 +59,11 @@
   },
   "documentPanel": {
     "documents": "Documents",
+    "delete": "Delete",
+    "deleteSuccess": "Document deleted",
+    "deleteSuccessDescription": "The document has been deleted.",
+    "deleteError": "Failed to delete document",
+    "deleteErrorDescription": "An error occurred while deleting the document.",
     "dragAndDropFiles": "Drag and drop files into the chat to add them as documents."
   },
   "toolMessage": {
