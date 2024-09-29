@@ -12,6 +12,7 @@ import { Logo } from "@/components/logo";
 import { useTranslation } from "react-i18next";
 import { useResourceDeleteMutation } from "@/services/resources/mutations";
 import { useToast } from "@/hooks/use-toast";
+import { usePanelContext } from "@/contexts/panel-context";
 
 function ResourceItem({
   resource,
@@ -185,13 +186,8 @@ export function ResourcePanel() {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(
     null
   );
-  const {
-    panelState,
-    setPanelState,
-    resources,
-    isSmallScreen,
-    isUploadingResources,
-  } = useChatContext();
+  const { resources, isSmallScreen, isUploadingResources } = useChatContext();
+  const { panelState, setPanelState } = usePanelContext();
 
   const panelWidth = isSmallScreen
     ? "100%"

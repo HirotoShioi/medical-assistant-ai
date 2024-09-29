@@ -141,12 +141,12 @@ export default function ChatPage() {
   const threadQuery = useThreadQuery(params.threadId!);
   const usageQuery = useUsageQuery();
   const messagesQuery = useMessagesQuery(threadQuery.data?.id);
-  const documentQuery = useResourcesQuery(threadQuery.data?.id);
+  const resourceQuery = useResourcesQuery(threadQuery.data?.id);
   const threadSettingsQuery = useThreadSettingsQuery(threadQuery.data?.id);
   if (
     !usageQuery.data ||
     !messagesQuery.data ||
-    !documentQuery.data ||
+    !resourceQuery.data ||
     !threadSettingsQuery.data
   ) {
     return <FullPageLoader label={t("page.loading")} />;
@@ -159,7 +159,7 @@ export default function ChatPage() {
     <ChatContextProvider
       thread={threadQuery.data!}
       messages={messagesQuery.data}
-      documents={documentQuery.data}
+      resources={resourceQuery.data}
       usage={usageQuery.data}
       threadSettings={threadSettingsQuery.data}
     >
