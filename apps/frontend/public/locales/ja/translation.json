@@ -57,21 +57,26 @@
     "save": "保存",
     "cancel": "キャンセル"
   },
-  "documentPanel": {
-    "documents": "ドキュメント",
-    "dragAndDropFiles": "ファイルをドラッグして追加"
+  "resourcePanel": {
+    "resource": "リソース",
+    "dragAndDropFiles": "ファイルをドラッグして追加",
+    "delete": "削除",
+    "deleteSuccess": "削除成功",
+    "deleteSuccessDescription": "リソースが削除されました。",
+    "deleteError": "削除失敗",
+    "deleteErrorDescription": "リソースの削除に失敗しました。"
   },
-  "documentUploader": {
+  "resourceUploader": {
     "dropFiles": "ファイルをここにドロップ",
     "dragAndDropFiles": "ファイルをドラッグして追加",
     "add": "保存",
     "enterText": "保存するテキストを入力してください",
-    "addDocuments": "ドキュメントを追加",
-    "addDocumentsDescription": "ドキュメントを追加すると、アプリがユーザーにとって重要な情報に基づいて回答を返せるようになります。"
+    "addResources": "リソースを追加",
+    "addResourcesDescription": "リソースを追加すると、アプリがユーザーにとって重要な情報に基づいて回答を返せるようになります。"
   },
   "toolMessage": {
     "searchingInformation": "情報を検索中...",
-    "embeddingDocuments": "ドキュメントを埋め込み中...",
+    "embedResource": "リソースを追加中...",
     "processing": "処理中...",
     "generatingDocument": "ドキュメントを生成中"
   },

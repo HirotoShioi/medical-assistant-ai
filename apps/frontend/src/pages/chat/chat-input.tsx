@@ -11,12 +11,8 @@ import { Tooltip } from "@/components/tooltip";
 import { useAlert } from "@/components/alert";
 
 function ChatInput() {
-  const {
-    chatHook,
-    usage,
-    setIsResourceUploaderOpen: setIsDocumentUploaderOpen,
-    isLoading,
-  } = useChatContext();
+  const { chatHook, usage, setIsResourceUploaderOpen, isLoading } =
+    useChatContext();
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -32,7 +28,7 @@ function ChatInput() {
           <Tooltip content="ファイルをアップロード">
             <Button
               className="p-2 rounded-lg h-8 w-8 border-0"
-              onClick={() => setIsDocumentUploaderOpen(true)}
+              onClick={() => setIsResourceUploaderOpen(true)}
               size="icon"
               disabled={isLoading || usage.isZero}
             >

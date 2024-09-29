@@ -14,29 +14,29 @@ import { useResourceDeleteMutation } from "@/services/resources/mutations";
 import { useToast } from "@/hooks/use-toast";
 
 function ResourceItem({
-  document,
+  resource,
   onSelect,
 }: {
-  document: Resource;
-  onSelect: (document: Resource) => void;
+  resource: Resource;
+  onSelect: (resource: Resource) => void;
 }) {
-  const deleteDocument = useResourceDeleteMutation();
+  const deleteResource = useResourceDeleteMutation();
   const { toast } = useToast();
   const { t } = useTranslation();
   async function handleDelete(e: React.MouseEvent<HTMLButtonElement>) {
     e.stopPropagation();
-    deleteDocument.mutate(document.id, {
+    deleteResource.mutate(resource.id, {
       onSuccess: () => {
         toast({
-          title: t("documentPanel.deleteSuccess"),
+          title: t("resourcePanel.deleteSuccess"),
           variant: "info",
-          description: t("documentPanel.deleteSuccessDescription"),
+          description: t("resourcePanel.deleteSuccessDescription"),
         });
       },
       onError: () => {
         toast({
-          title: t("documentPanel.deleteError"),
-          description: t("documentPanel.deleteErrorDescription"),
+          title: t("resourcePanel.deleteError"),
+          description: t("resourcePanel.deleteErrorDescription"),
         });
       },
     });
@@ -44,13 +44,13 @@ function ResourceItem({
   return (
     <div
       className="flex items-center p-2 bg-white rounded-lg shadow-md border hover:bg-gray-50 transition cursor-pointer w-full"
-      onClick={() => onSelect(document)}
+      onClick={() => onSelect(resource)}
     >
       <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
         <FileIcon className="w-6 h-6 text-gray-600" />
       </div>
       <div className="flex-1 flex items-center overflow-hidden">
-        <p className="text-sm font-medium truncate">{document.title}</p>
+        <p className="text-sm font-medium truncate">{resource.title}</p>
       </div>
       <Button
         className="text-gray-400 hover:text-red-600 w-8 h-8 rounded-full hover:bg-gray-200"
@@ -75,19 +75,19 @@ function ResourceItemSkeleton() {
 }
 
 function ResourceList({
-  documents,
+  resources,
   onSelect,
 }: {
-  documents: Resource[];
-  onSelect: (document: Resource) => void;
+  resources: Resource[];
+  onSelect: (resource: Resource) => void;
 }) {
   const { t } = useTranslation();
-  if (documents.length === 0) {
+  if (resources.length === 0) {
     return (
       <div className="flex flex-row items-center justify-center px-2 gap-4">
         <FileIcon className="w-8 h-8 text-gray-500" />
         <p className="text-gray-500 text-sm mt-2">
-          {t("documentPanel.dragAndDropFiles")}
+          {t("resourcePanel.dragAndDropFiles")}
         </p>
       </div>
     );
@@ -95,8 +95,8 @@ function ResourceList({
 
   return (
     <div className="flex flex-col gap-2 w-full px-4">
-      {documents.map((document, index) => (
-        <ResourceItem key={index} document={document} onSelect={onSelect} />
+      {resources.map((resource, index) => (
+        <ResourceItem key={index} resource={resource} onSelect={onSelect} />
       ))}
     </div>
   );
@@ -112,23 +112,23 @@ function ResourceListSkeleton() {
   );
 }
 
-function Resources({ document }: { document: Resource }) {
+function Resources({ resource }: { resource: Resource }) {
   const rendered = useMemo(() => {
-    switch (document.fileType) {
+    switch (resource.fileType) {
       case "text/plain":
-        return <p className="whitespace-pre-wrap">{document.content}</p>;
+        return <p className="whitespace-pre-wrap">{resource.content}</p>;
       case "text/markdown":
-        return <Markdown content={document.content} />;
+        return <Markdown content={resource.content} />;
       case "application/json":
         return (
           <div className="bg-gray-100 p-2 rounded-md">
-            <code className="whitespace-pre-wrap">{document.content}</code>
+            <code className="whitespace-pre-wrap">{resource.content}</code>
           </div>
         );
       default:
-        return <p className="whitespace-pre-wrap">{document.content}</p>;
+        return <p className="whitespace-pre-wrap">{resource.content}</p>;
     }
-  }, [document.content, document.fileType]);
+  }, [resource.content, resource.fileType]);
   return (
     <ScrollArea className="h-[calc(100vh-6rem)]">
       <div className="px-4 pb-4">{rendered}</div>
@@ -137,14 +137,14 @@ function Resources({ document }: { document: Resource }) {
 }
 
 function Header({
-  document,
+  resource,
   onClose,
 }: {
-  document: Resource | null;
+  resource: Resource | null;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
-  if (!document) {
+  if (!resource) {
     return (
       <div className="sticky">
         <div className="pb-4 top-0 p-2 flex items-center">
@@ -153,7 +153,7 @@ function Header({
         <div className="flex justify-between items-center px-4">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold">
-              {t("documentPanel.documents")}
+              {t("resourcePanel.resource")}
             </h2>
             <ResourceUploader />
           </div>
@@ -166,7 +166,7 @@ function Header({
     <>
       <div className="flex gap-2 flex-row w-full px-4 pt-4">
         <div className="flex-1 flex items-center overflow-hidden">
-          <h2 className="text-lg font-semibold truncate">{document.title}</h2>
+          <h2 className="text-lg font-semibold truncate">{resource.title}</h2>
         </div>
         <Button
           variant="ghost"
@@ -188,9 +188,9 @@ export function ResourcePanel() {
   const {
     panelState,
     setPanelState,
-    resources: documents,
+    resources,
     isSmallScreen,
-    isUploadingResources: isUploadingDocuments,
+    isUploadingResources,
   } = useChatContext();
 
   const panelWidth = isSmallScreen
@@ -199,8 +199,8 @@ export function ResourcePanel() {
     ? "700px"
     : "300px";
 
-  function setResource(document: Resource) {
-    setSelectedResource(document);
+  function setResource(resource: Resource) {
+    setSelectedResource(resource);
     setPanelState("detail");
   }
 
@@ -225,15 +225,15 @@ export function ResourcePanel() {
         style={{ width: panelWidth }}
       >
         <div className="flex flex-col gap-4">
-          <Header document={selectedResource} onClose={handleClose} />
+          <Header resource={selectedResource} onClose={handleClose} />
           <div className="overflow-hidden">
             <div className="w-full overflow-y-auto h-full">
-              {isUploadingDocuments ? (
+              {isUploadingResources ? (
                 <ResourceListSkeleton />
               ) : selectedResource ? (
-                <Resources document={selectedResource} />
+                <Resources resource={selectedResource} />
               ) : (
-                <ResourceList documents={documents} onSelect={setResource} />
+                <ResourceList resources={resources} onSelect={setResource} />
               )}
             </div>
           </div>

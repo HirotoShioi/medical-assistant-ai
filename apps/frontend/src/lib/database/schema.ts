@@ -30,7 +30,7 @@ const resources = pgTable("resources", {
     .default(sql`now()`),
 });
 
-// Schema for documents - used to validate API requests
+// Schema for resources - used to validate API requests
 const insertResourceSchema = createSelectSchema(resources).omit({
   id: true,
   createdAt: true,

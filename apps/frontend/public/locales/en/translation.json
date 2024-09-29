@@ -57,28 +57,28 @@
     "save": "Save",
     "cancel": "Cancel"
   },
-  "documentPanel": {
-    "documents": "Documents",
-    "delete": "Delete",
-    "deleteSuccess": "Document deleted",
-    "deleteSuccessDescription": "The document has been deleted.",
-    "deleteError": "Failed to delete document",
-    "deleteErrorDescription": "An error occurred while deleting the document.",
-    "dragAndDropFiles": "Drag and drop files into the chat to add them as documents."
+  "resourcePanel": {
+    "resource": "リソース",
+    "dragAndDropFiles": "ファイルをドラッグして追加",
+    "delete": "削除",
+    "deleteSuccess": "削除成功",
+    "deleteSuccessDescription": "リソースが削除されました。",
+    "deleteError": "削除失敗",
+    "deleteErrorDescription": "リソースの削除に失敗しました。"
   },
   "toolMessage": {
     "searchingInformation": "Searching information",
-    "embeddingDocuments": "Embedding documents",
+    "embeddingResources": "Embedding resources",
     "processing": "Processing...",
     "generatingDocument": "Generating document"
   },
-  "documentUploader": {
+  "resourceUploader": {
     "dropFiles": "Drop files here",
     "dragAndDropFiles": "Drag and drop files",
     "add": "Add",
     "enterText": "Enter text to save",
-    "addDocuments": "Add documents",
-    "addDocumentsDescription": "Adding documents will allow the app to provide more accurate answers based on important information for the user."
+    "addResources": "Add resources",
+    "addResourcesDescription": "Adding resources will allow the app to provide more accurate answers based on important information for the user."
   },
   "callback": {
     "redirecting": "Redirecting..."

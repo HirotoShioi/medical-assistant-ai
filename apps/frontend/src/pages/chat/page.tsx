@@ -18,7 +18,7 @@ import {
 import { useDropzone } from "react-dropzone";
 import { Loader2 } from "lucide-react";
 
-const Document = React.memo(ResourcePanel);
+const Resource = React.memo(ResourcePanel);
 
 function ChatContainer({ children }: { children: React.ReactNode }) {
   return (
@@ -106,7 +106,7 @@ function ChatPageContent() {
     <div {...getRootProps()} className="flex flex-row h-screen min-w-[20rem]">
       <input {...getInputProps()} />
       {isDragging && <FileUploadOverlay />}
-      {!isSmallScreen && <Document />}
+      {!isSmallScreen && <Resource />}
       {isGeneratingDocument && <DocumentGeneratorLoaderOverlay />}
       <div className="w-full h-full flex flex-col">
         <ChatTitle />

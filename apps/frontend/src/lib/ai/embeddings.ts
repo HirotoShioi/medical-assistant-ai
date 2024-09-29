@@ -18,18 +18,18 @@ async function getEmbeddingModel() {
 }
 
 /**
- * Generates embeddings for a list of documents.
- * @param documents The documents to generate embeddings for.
+ * Generates embeddings for a list of contents.
+ * @param contents The contents to generate embeddings for.
  * @returns The embeddings and the content.
  */
 export const generateEmbeddings = async (
-  documents: string[]
+  contents: string[]
 ): Promise<{ embeddings: number[]; content: string }[]> => {
   const { embeddings } = await embedMany({
     model: await getEmbeddingModel(),
-    values: documents,
+    values: contents,
   });
-  return embeddings.map((e, i) => ({ embeddings: e, content: documents[i] }));
+  return embeddings.map((e, i) => ({ embeddings: e, content: contents[i] }));
 };
 
 /**

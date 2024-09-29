@@ -5,7 +5,7 @@ import { NewResourceParams } from "@/models";
 export const useResourceDeleteMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (documentId: string) => deleteResourceById(documentId),
+    mutationFn: (resourceId: string) => deleteResourceById(resourceId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resources"] });
     },

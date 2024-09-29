@@ -16,8 +16,8 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
     switch (toolInvocation.toolName as ToolNames) {
       case "getRelavantInformation":
         return t("toolMessage.searchingInformation");
-      case "embedDocument":
-        return t("toolMessage.embeddingDocuments");
+      case "embedResource":
+        return t("toolMessage.embeddingResources");
       case "generateDocument":
         return t("toolMessage.generatingDocument");
       default:
@@ -87,5 +87,5 @@ export default memo(ChatMessage, (prevProps, nextProps) => {
     !nextProps.isLast &&
     prevProps.isLast === nextProps.isLast &&
     prevProps.message === nextProps.message
-  )
-})
+  );
+});

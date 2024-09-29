@@ -21,8 +21,8 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 
 export default function ResourceUploader() {
   const {
-    isResourceUploaderOpen: isDocumentUploaderOpen,
-    setIsResourceUploaderOpen: setIsDocumentUploaderOpen,
+    isResourceUploaderOpen,
+    setIsResourceUploaderOpen,
     usage,
     uploadFiles,
     uploadText: uploadTextMutation,
@@ -53,14 +53,14 @@ export default function ResourceUploader() {
     if (!user || usage.isZero || !textAreaRef.current?.value) {
       return;
     }
-    setIsDocumentUploaderOpen(false);
+    setIsResourceUploaderOpen(false);
     await uploadTextMutation(textAreaRef.current.value);
   };
 
   return (
     <Dialog
-      open={isDocumentUploaderOpen}
-      onOpenChange={setIsDocumentUploaderOpen}
+      open={isResourceUploaderOpen}
+      onOpenChange={setIsResourceUploaderOpen}
     >
       <DialogTrigger className="focus:outline-none" disabled={usage.isZero}>
         <CirclePlus
@@ -74,17 +74,17 @@ export default function ResourceUploader() {
       <DialogContent className="max-w-4xl p-6">
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            {t("documentUploader.addDocuments")}
+            {t("resourceUploader.addResources")}
           </DialogTitle>
           <DialogDescription className="text-lg">
-            {t("documentUploader.addDocumentsDescription")}
+            {t("resourceUploader.addResourcesDescription")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <textarea
             className="w-full h-80 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             ref={textAreaRef}
-            placeholder={t("documentUploader.enterText")}
+            placeholder={t("resourceUploader.enterText")}
             disabled={usage.isZero}
           />
           <div
@@ -96,15 +96,15 @@ export default function ResourceUploader() {
             <input {...getInputProps()} disabled={usage.isZero} />
             <p className="text-gray-500">
               {isDragActive
-                ? t("documentUploader.dropFiles")
-                : t("documentUploader.dragAndDropFiles")}
+                ? t("resourceUploader.dropFiles")
+                : t("resourceUploader.dragAndDropFiles")}
             </p>
           </div>
         </div>
         <DialogFooter className="flex justify-end">
           <UsageTooltip usage={usage}>
             <Button onClick={handleUploadText} disabled={usage.isZero}>
-              {t("documentUploader.add")}
+              {t("resourceUploader.add")}
             </Button>
           </UsageTooltip>
         </DialogFooter>

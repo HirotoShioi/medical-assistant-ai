@@ -53,7 +53,7 @@ export const embedResource = async (input: NewResourceParams) => {
     const { content, threadId, title, fileType } =
       insertResourceSchema.parse(input);
     const chunks = await generateChunks(content);
-    const [document] = await db
+    const [resource] = await db
       .insert(schema.resources)
       .values({
         content: content,
@@ -67,7 +67,7 @@ export const embedResource = async (input: NewResourceParams) => {
         const situatedContext = await situateContext(content, chunk);
         const { embedding } = await generateEmbedding(situatedContext);
         await db.insert(schema.embeddings).values({
-          documentId: document.id,
+          resourceId: resource.id,
           content: situatedContext,
           embedding: embedding,
           threadId: threadId,

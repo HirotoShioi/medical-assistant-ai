@@ -9,7 +9,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getResourcesByThreadId } from "@/services/resources/service";
-import { generateDocument as generateDocument } from "@/lib/ai/generate-document";
+import { generateDocument } from "@/lib/ai/generate-document";
 import { ThreadSettings } from "@/models";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
@@ -139,5 +139,5 @@ function generateDocumentTool(threadId: string, settings: ThreadSettings) {
 }
 export type ToolNames =
   | "getRelavantInformation"
-  | "embedDocument"
+  | "embedResource"
   | "generateDocument";
