@@ -43,6 +43,9 @@ export default function DocumentUploader() {
       "text/plain": [],
       "text/csv": [],
       "application/json": [],
+      "image/png": [],
+      "image/jpeg": [],
+      "image/jpg": [],
     },
   });
 

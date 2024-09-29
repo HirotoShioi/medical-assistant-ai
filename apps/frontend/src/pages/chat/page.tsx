@@ -62,6 +62,9 @@ function ChatPageContent() {
       "text/plain": [],
       "text/csv": [],
       "application/json": [],
+      "image/png": [],
+      "image/jpeg": [],
+      "image/jpg": [],
     },
   });
 

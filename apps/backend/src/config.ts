@@ -31,7 +31,7 @@ const KILO_BYTE = 1 * 1024;
 const MEGA_BYTE = KILO_BYTE * 1024;
 
 export const ChatConfig = {
-	maxBodySize: KILO_BYTE * 50,
+	maxBodySize: MEGA_BYTE * 2,
 }
 
 export const EmbeddingsConfig = {

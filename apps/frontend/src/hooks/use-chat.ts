@@ -66,6 +66,7 @@ async function handleChat(req: Request) {
     model: model,
     system: settings.systemMessage,
     maxRetries: 0,
+    toolChoice: "auto",
     messages: convertToCoreMessages(messages),
     tools: {
       getRelavantInformation: getRelavantInformationTool(threadId),
@@ -136,4 +137,7 @@ function generateDocumentTool(threadId: string, settings: ThreadSettings) {
     },
   });
 }
-export type ToolNames = "getRelavantInformation" | "embedDocument" | "generateDocument";
+export type ToolNames =
+  | "getRelavantInformation"
+  | "embedDocument"
+  | "generateDocument";
