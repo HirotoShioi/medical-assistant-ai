@@ -55,7 +55,7 @@ export function useFileUpload(
       toolInvocations: fileWithText.map(({ text, file }) => ({
         state: "result",
         toolCallId: nanoid(),
-        toolName: "embedDocument",
+        toolName: "embedResource",
         args: {},
         result: {
           success: true,

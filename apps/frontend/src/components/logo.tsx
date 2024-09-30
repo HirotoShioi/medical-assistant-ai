@@ -52,7 +52,7 @@ export function Logo() {
                 navigate("/");
                 setOpen(false);
               }}
-              className="cursor-pointer py-4"
+              className="cursor-pointer"
             >
               {APP_NAME}
             </SheetTitle>

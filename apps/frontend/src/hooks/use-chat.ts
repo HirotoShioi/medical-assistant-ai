@@ -70,7 +70,7 @@ async function handleChat(req: Request) {
     messages: convertToCoreMessages(messages),
     tools: {
       getRelavantInformation: getRelavantInformationTool(threadId),
-      embedDocument: embedDocumentTool(),
+      embedResource: embedResourceTool(),
       generateDocument: generateDocumentTool(threadId, settings),
     },
   });
@@ -104,7 +104,7 @@ function getRelavantInformationTool(threadId: string) {
   });
 }
 
-function embedDocumentTool() {
+function embedResourceTool() {
   return tool({
     description:
       "Embed a document into the knowledge base. Do not call this tool directly, it is used internally by the system.",

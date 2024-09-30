@@ -78,7 +78,7 @@
   },
   "toolMessage": {
     "searchingInformation": "情報を検索中...",
-    "embedResource": "リソースを追加中...",
+    "embeddingResources": "リソースを追加中...",
     "processing": "処理中...",
     "generatingDocument": "ドキュメントを生成中"
   },
