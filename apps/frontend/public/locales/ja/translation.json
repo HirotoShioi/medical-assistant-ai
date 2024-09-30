@@ -61,7 +61,7 @@
     "resource": "リソース",
     "dragAndDropFiles": "ファイルをドラッグして追加",
     "delete": "削除",
-    "deleteSuccess": "削除成功",
+    "deleteSuccess": "リソース削除",
     "deleteSuccessDescription": "リソースが削除されました。",
     "deleteError": "削除失敗",
     "deleteErrorDescription": "リソースの削除に失敗しました。"
@@ -69,10 +69,12 @@
   "resourceUploader": {
     "dropFiles": "ファイルをここにドロップ",
     "dragAndDropFiles": "ファイルをドラッグして追加",
-    "add": "保存",
+    "add": "追加",
     "enterText": "保存するテキストを入力してください",
     "addResources": "リソースを追加",
-    "addResourcesDescription": "リソースを追加すると、アプリがユーザーにとって重要な情報に基づいて回答を返せるようになります。"
+    "addResourcesDescription": "リソースを追加すると、アプリがユーザーにとって重要な情報に基づいて回答を返せるようになります。",
+    "previewNotAvailable": "プレビューは利用できません",
+    "uploadedFiles": "アップロードされたファイル"
   },
   "toolMessage": {
     "searchingInformation": "情報を検索中...",

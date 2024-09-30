@@ -1,6 +1,6 @@
 // src/components/LargeDialog.jsx
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useChatContext } from "@/pages/chat/context";
 import { UsageTooltip } from "@/components/usage-tooltip";
@@ -19,24 +19,59 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
+const FilePreview = ({ file }: { file: File }) => {
+  const { t } = useTranslation();
+  switch (file.type) {
+    case "image/png":
+    case "image/jpeg":
+    case "image/jpg":
+      return (
+        <img
+          src={URL.createObjectURL(file)}
+          alt={file.name}
+          width={100}
+          height={100}
+          className="max-w-full h-auto"
+        />
+      );
+    case "application/pdf":
+    case "text/markdown":
+    case "text/plain":
+    case "text/csv":
+    case "application/json":
+      return (
+        <div className="flex items-center gap-2">
+          <File size={20} />
+          {file.name}
+        </div>
+      );
+    default:
+      return <p>{t("resourceUploader.previewNotAvailable")}</p>;
+  }
+};
+
 export default function ResourceUploader() {
   const {
     isResourceUploaderOpen,
     setIsResourceUploaderOpen,
     usage,
+    uploadText,
     uploadFiles,
-    uploadText: uploadTextMutation,
   } = useChatContext();
   const { t } = useTranslation();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuthenticator((u) => [u.user]);
 
-  const onDrop = async (acceptedFiles: File[]) => {
-    await uploadFiles(acceptedFiles);
+  // プレビューファイルの状態を配列に変更
+  const [previewFiles, setPreviewFiles] = useState<File[]>([]);
+
+  // onDropAccepted 関数に名前を変更し、複数ファイルに対応
+  const onDropAccepted = async (acceptedFiles: File[]) => {
+    setPreviewFiles(acceptedFiles);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: onDrop,
+    onDropAccepted, // onDrop から onDropAccepted に変更
     accept: {
       "application/pdf": [],
       "text/markdown": [],
@@ -50,17 +85,27 @@ export default function ResourceUploader() {
   });
 
   const handleUploadText = async () => {
-    if (!user || usage.isZero || !textAreaRef.current?.value) {
+    if (!user || usage.isZero) {
       return;
     }
+    if (textAreaRef.current?.value) {
+      uploadText(textAreaRef.current.value);
+    }
+
+    if (previewFiles.length > 0) {
+      uploadFiles(previewFiles);
+    }
     setIsResourceUploaderOpen(false);
-    await uploadTextMutation(textAreaRef.current.value);
+    setPreviewFiles([]); // プレビューをクリア
   };
 
   return (
     <Dialog
       open={isResourceUploaderOpen}
-      onOpenChange={setIsResourceUploaderOpen}
+      onOpenChange={(open) => {
+        setIsResourceUploaderOpen(open);
+        if (!open) setPreviewFiles([]); // ダイアログが閉じられたときにプレビューをクリア
+      }}
     >
       <DialogTrigger className="focus:outline-none" disabled={usage.isZero}>
         <CirclePlus
@@ -100,6 +145,16 @@ export default function ResourceUploader() {
                 : t("resourceUploader.dragAndDropFiles")}
             </p>
           </div>
+          {previewFiles.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">
+                {t("resourceUploader.uploadedFiles")}
+              </h3>
+              {previewFiles.map((file, index) => (
+                <FilePreview key={index} file={file} />
+              ))}
+            </div>
+          )}
         </div>
         <DialogFooter className="flex justify-end">
           <UsageTooltip usage={usage}>
