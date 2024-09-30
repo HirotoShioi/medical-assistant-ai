@@ -1,21 +1,17 @@
-// src/components/LargeDialog.jsx
-
 import { useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogTitle,
   DialogHeader,
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { CirclePlus, File } from "lucide-react";
+import { File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useChatContext } from "@/pages/chat/context";
 import { UsageTooltip } from "@/components/usage-tooltip";
-import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
@@ -107,15 +103,6 @@ export default function ResourceUploader() {
         if (!open) setPreviewFiles([]); // ダイアログが閉じられたときにプレビューをクリア
       }}
     >
-      <DialogTrigger className="focus:outline-none" disabled={usage.isZero}>
-        <CirclePlus
-          size={20}
-          className={cn(
-            "focus:outline-none cursor-pointer",
-            usage.isZero ? "opacity-50 cursor-not-allowed" : ""
-          )}
-        />
-      </DialogTrigger>
       <DialogContent className="max-w-4xl p-6">
         <DialogHeader>
           <DialogTitle className="text-2xl">

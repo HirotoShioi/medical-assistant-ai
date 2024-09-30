@@ -1,10 +1,9 @@
-import { XIcon, FileIcon, X } from "lucide-react";
+import { XIcon, FileIcon, X, CirclePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Resource } from "@/models";
 import { useMemo, useState } from "react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Markdown } from "@/components/markdown";
-import ResourceUploader from "./resource-uploader";
 import { useChatContext } from "@/pages/chat/context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -145,6 +144,7 @@ function Header({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const { usage, setIsResourceUploaderOpen } = useChatContext();
   if (!resource) {
     return (
       <div className="sticky">
@@ -156,7 +156,14 @@ function Header({
             <h2 className="text-lg font-semibold">
               {t("resourcePanel.resource")}
             </h2>
-            <ResourceUploader />
+            <CirclePlus
+              size={20}
+              className={cn(
+                "focus:outline-none cursor-pointer",
+                usage.isZero ? "opacity-50 cursor-not-allowed" : ""
+              )}
+              onClick={() => setIsResourceUploaderOpen(true)}
+            />
           </div>
         </div>
       </div>

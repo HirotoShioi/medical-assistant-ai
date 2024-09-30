@@ -17,6 +17,7 @@ import {
 } from "@/services/threads/queries";
 import { useDropzone } from "react-dropzone";
 import { Loader2 } from "lucide-react";
+import ResourceUploader from "./resource-uploader";
 
 const Resource = React.memo(ResourcePanel);
 
@@ -108,6 +109,7 @@ function ChatPageContent() {
       {isDragging && <FileUploadOverlay />}
       {!isSmallScreen && <Resource />}
       {isGeneratingDocument && <DocumentGeneratorLoaderOverlay />}
+      <ResourceUploader />
       <div className="w-full h-full flex flex-col">
         <ChatTitle />
         <div className="flex-grow overflow-hidden flex flex-col relative">
