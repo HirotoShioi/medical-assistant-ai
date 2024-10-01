@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
 const FilePreview = ({ file }: { file: File }) => {
-  const { t } = useTranslation();
   switch (file.type) {
     case "image/png":
     case "image/jpeg":
@@ -30,19 +29,13 @@ const FilePreview = ({ file }: { file: File }) => {
           className="max-w-full h-auto"
         />
       );
-    case "application/pdf":
-    case "text/markdown":
-    case "text/plain":
-    case "text/csv":
-    case "application/json":
+    default:
       return (
         <div className="flex items-center gap-2">
           <File size={20} />
           {file.name}
         </div>
       );
-    default:
-      return <p>{t("resourceUploader.previewNotAvailable")}</p>;
   }
 };
 
@@ -66,6 +59,7 @@ export default function ResourceUploader() {
     setPreviewFiles(acceptedFiles);
   };
 
+  // FIXME: なぜかファイル選択でマークダウンを選択するとプレビューが表示されない
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDropAccepted, // onDrop から onDropAccepted に変更
     accept: {
