@@ -6,11 +6,13 @@ import {
   FileText,
   Home,
   HeartPulse,
+  MessageSquare,
 } from "lucide-react";
 import { z } from "zod";
 
 const iconMap = {
-  actvity: <Activity className="w-6 h-6  text-blue-500" />,
+  "message-square": <MessageSquare className="w-6 h-6  text-blue-500" />,
+  activity: <Activity className="w-6 h-6  text-blue-500" />,
   stethoscope: <Stethoscope className="w-6 h-6 text-red-500" />,
   users: <Users className="w-6 h-6 text-yellow-500" />,
   "file-text": <FileText className="w-6 h-6 text-purple-500" />,
@@ -38,16 +40,16 @@ type SummaryTemplate = BaseTemplate & {
   type: "summary";
 };
 
-type ConsultationTemplate = BaseTemplate & {
-  type: "consultation";
+type ChatTemplate = BaseTemplate & {
+  type: "chat";
 };
 
-type Template = ReportTemplate | SummaryTemplate | ConsultationTemplate;
+type Template = ReportTemplate | SummaryTemplate | ChatTemplate;
 
 type DatabaseTemplate = typeof schema.templates.$inferSelect;
 
 const templateSchema = z.object({
-  type: z.enum(["report", "summary", "consultation"]),
+  type: z.enum(["report", "summary", "chat"]),
   title: z.string(),
   overview: z.string(),
   description: z.string(),
@@ -78,11 +80,11 @@ function toTemplate(data: DatabaseTemplate): Template {
         reportGenerationPrompt: data.reportGenerationPrompt ?? "",
         originalTemplate: parsed.success ? parsed.data : undefined,
       };
-    case "consultation":
+    case "chat":
       return {
         ...data,
         icon: data.icon,
-        type: "consultation" as const,
+        type: "chat" as const,
         reportGenerationPrompt: data.reportGenerationPrompt ?? "",
         originalTemplate: parsed.success ? parsed.data : undefined,
       };
@@ -99,8 +101,8 @@ type BaseNewTemplateParams = {
   reportGenerationPrompt?: string;
 };
 
-type NewConsultationTemplateParams = BaseNewTemplateParams & {
-  type: "consultation";
+type NewChatTemplateParams = BaseNewTemplateParams & {
+  type: "chat";
 };
 
 type NewReportTemplateParams = BaseNewTemplateParams & {
@@ -112,7 +114,7 @@ type NewSummaryTemplateParams = BaseNewTemplateParams & {
 };
 
 type NewTemplateParams =
-  | NewConsultationTemplateParams
+  | NewChatTemplateParams
   | NewReportTemplateParams
   | NewSummaryTemplateParams;
 
@@ -120,7 +122,7 @@ export { toTemplate, iconMap };
 export type {
   ReportTemplate,
   SummaryTemplate,
-  ConsultationTemplate,
+  ChatTemplate,
   Template,
   NewTemplateParams,
 };

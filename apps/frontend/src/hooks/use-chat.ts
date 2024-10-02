@@ -118,6 +118,7 @@ function embedResourceTool() {
   });
 }
 
+// WARNING: This tool is not used anymore, but it is kept here so that the tool names are being shown in the UI
 function generateDocumentTool(threadId: string) {
   return tool({
     description:

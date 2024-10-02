@@ -65,7 +65,8 @@ function ChatInput() {
 }
 
 function DocumentGenerationButton() {
-  const { usage, generateDocument, isLoading } = useChatContext();
+  const { usage, generateDocument, isLoading, threadSettings } =
+    useChatContext();
   const { openAlert } = useAlert();
   function handleClick() {
     openAlert({
@@ -84,6 +85,9 @@ function DocumentGenerationButton() {
         },
       ],
     });
+  }
+  if (threadSettings.templateType !== "report") {
+    return null;
   }
   return (
     <Tooltip content="ドキュメントを生成">

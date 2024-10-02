@@ -1,7 +1,7 @@
 import { getDB } from "@/lib/database/client";
 import { schema } from "@/lib/database/schema";
 import { NewTemplateParams, Template, toTemplate } from "@/models/template";
-import { eq, desc } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { nanoid } from "nanoid";
 import { z } from "zod";
@@ -11,7 +11,7 @@ export const getTemplates = async (): Promise<Template[]> => {
   const templates = await db
     .select()
     .from(schema.templates)
-    .orderBy(desc(schema.templates.title));
+    .orderBy(asc(schema.templates.title));
   return templates.map(toTemplate);
 };
 

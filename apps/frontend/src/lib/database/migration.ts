@@ -66,7 +66,7 @@ export const migrations = [
     "description" text NOT NULL,
     "system_message" text NOT NULL,
     "initial_assistant_message" text NOT NULL,
-    "type" text NOT NULL CHECK (type IN ('report', 'summary', 'consultation')),
+    "type" text NOT NULL CHECK (type IN ('report', 'summary', 'chat')),
     "report_generation_prompt" text,
     "icon" varchar(50) NOT NULL,
     "created_at" timestamp DEFAULT now() NOT NULL,
@@ -81,7 +81,7 @@ export const migrations = [
     "template_overview" text NOT NULL,
     "system_message" text NOT NULL,
     "initial_assistant_message" text NOT NULL,
-    "template_type" text NOT NULL CHECK (template_type IN ('report', 'summary', 'consultation')),
+    "template_type" text NOT NULL CHECK (template_type IN ('report', 'summary', 'chat')),
     "report_generation_prompt" text,
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL

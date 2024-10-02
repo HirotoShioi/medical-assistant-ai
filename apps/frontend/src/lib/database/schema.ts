@@ -109,7 +109,7 @@ const templates = pgTable("templates", {
   systemMessage: text("system_message").notNull(),
   initialAssistantMessage: text("initial_assistant_message").notNull(),
   type: text("type", {
-    enum: ["report", "summary", "consultation"],
+    enum: ["report", "summary", "chat"],
   }).notNull(),
   reportGenerationPrompt: text("report_generation_prompt"), // reportタイプの場合に必要
   icon: varchar("icon", { length: 50 }).notNull(), // Lucideのアイコン名を格納するフィールド
@@ -147,7 +147,7 @@ const threadSettings = pgTable("thread_settings", {
   initialAssistantMessage: text("initial_assistant_message").notNull(),
 
   templateType: text("template_type", {
-    enum: ["report", "summary", "consultation"],
+    enum: ["report", "summary", "chat"],
   }).notNull(),
 
   reportGenerationPrompt: text("report_generation_prompt"),
