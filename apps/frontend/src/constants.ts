@@ -9,3 +9,4 @@ export const SIMILARITY_THRESHOLD = 0.5;
 export const DB_NAME = "llmchat";
 export const BASE_MODEL = "gpt-4o-mini";
 export const APP_NAME = "Medical Assistant AI";
+export const MAX_STEPS_FOR_TOOL_CALLS = 3;

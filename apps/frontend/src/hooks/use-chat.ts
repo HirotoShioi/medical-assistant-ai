@@ -4,20 +4,18 @@ import { saveMessage } from "@/services/messages";
 import { createOpenAI } from "@ai-sdk/openai";
 import { z } from "zod";
 import { findRelevantContent } from "@/lib/ai/embeddings";
-import { BASE_MODEL } from "@/constants";
+import { BASE_MODEL, MAX_STEPS_FOR_TOOL_CALLS } from "@/constants";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getResourcesByThreadId } from "@/services/resources/service";
 import { generateDocument } from "@/lib/ai/generate-document";
-import { ThreadSettings } from "@/models";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
     id: threadId,
     initialMessages,
     api: "/api/chat",
-    maxToolRoundtrips: 3,
     keepLastMessageOnError: true,
     fetch: (_input, init) => handleChat(new Request(`/chat/${threadId}`, init)),
     onFinish: async (message) => {
@@ -66,12 +64,13 @@ async function handleChat(req: Request) {
     model: model,
     system: settings.systemMessage,
     maxRetries: 0,
+    maxSteps: MAX_STEPS_FOR_TOOL_CALLS,
     toolChoice: "auto",
     messages: convertToCoreMessages(messages),
     tools: {
       getRelavantInformation: getRelavantInformationTool(threadId),
       embedResource: embedResourceTool(),
-      generateDocument: generateDocumentTool(threadId, settings),
+      generateDocument: generateDocumentTool(threadId),
     },
   });
   return result.toDataStreamResponse();
@@ -119,14 +118,15 @@ function embedResourceTool() {
   });
 }
 
-function generateDocumentTool(threadId: string, settings: ThreadSettings) {
+function generateDocumentTool(threadId: string) {
   return tool({
     description:
       "Generate a document from the chat and documents. Do not call this tool directly, it is used internally by the system.",
     parameters: z.object({}),
     execute: async () => {
-      const [messages, documents] = await Promise.all([
+      const [messages, settings, documents] = await Promise.all([
         getMessagesByThreadId(threadId),
+        getThreadSettingsById(threadId),
         getResourcesByThreadId(threadId),
       ]);
       return generateDocument({
@@ -137,6 +137,7 @@ function generateDocumentTool(threadId: string, settings: ThreadSettings) {
     },
   });
 }
+
 export type ToolNames =
   | "getRelavantInformation"
   | "embedResource"
