@@ -40,8 +40,11 @@
     "settings": "Settings"
   },
   "error": {
-    "unexpectedError": "Sorry, an unexpected error has occurred.",
-    "goHome": "Go Home"
+    "oops": "Oops!",
+    "unexpectedError": "An unexpected error has occurred.",
+    "goHome": "Go to Home",
+    "databaseReset": "If the problem persists, go to the settings page and try resetting the database.",
+    "goSettings": "Go to Settings"
   },
   "usageTooltip": {
     "pleaseSignIn": "Please sign in to use this feature",

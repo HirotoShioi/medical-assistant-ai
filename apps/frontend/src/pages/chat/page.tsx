@@ -145,6 +145,7 @@ export default function ChatPage() {
   const messagesQuery = useMessagesQuery(threadQuery.data?.id);
   const resourceQuery = useResourcesQuery(threadQuery.data?.id);
   const threadSettingsQuery = useThreadSettingsQuery(threadQuery.data?.id);
+  throw new Error("test");
   if (
     !usageQuery.data ||
     !messagesQuery.data ||

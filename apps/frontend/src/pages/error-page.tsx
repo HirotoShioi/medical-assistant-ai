@@ -5,6 +5,8 @@ import { useRouteError } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/header";
+import { AlertTitle, AlertDescription, Alert } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function ErrorPage() {
   const error = useRouteError() as Error;
@@ -17,16 +19,23 @@ export default function ErrorPage() {
     <div id="error-page">
       <Header />
       <div className={cn(pageWrapperStyles, "space-y-4")}>
-        <h1 className="text-2xl">Oops!</h1>
-        <div>
-          <p>{t("error.unexpectedError")}</p>
-          <p>
-            <i>{error.message}</i>
-          </p>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {t("error.unexpectedError")}
+            <br />
+            {t("error.databaseReset")}
+          </AlertDescription>
+        </Alert>
+        <div className="grid gap-4 md:grid-cols-2 w-full">
+          <Button asChild>
+            <Link to="/">{t("error.goHome")}</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/settings">{t("error.goSettings")}</Link>
+          </Button>
         </div>
-        <Button asChild>
-          <Link to="/">{t("error.goHome")}</Link>
-        </Button>
       </div>
     </div>
   );

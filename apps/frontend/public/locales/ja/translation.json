@@ -40,8 +40,11 @@
     "settings": "設定"
   },
   "error": {
+    "oops": "おっと！",
     "unexpectedError": "予期せぬエラーが発生しました。",
-    "goHome": "ホームに戻る"
+    "goHome": "ホームに戻る",
+    "databaseReset": "問題が解決しない場合は、お手数ですが、設定ページからデータベースのリセットを試みてください。",
+    "goSettings": "設定に移動"
   },
   "usageTooltip": {
     "pleaseSignIn": "この機能を使用するにはサインインしてください",
