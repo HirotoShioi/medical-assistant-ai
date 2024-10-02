@@ -7,8 +7,9 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { desc, eq } from "drizzle-orm";
 import { getModel } from "@/lib/ai/model";
 import { BASE_MODEL } from "@/constants";
-import { PromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import { HumanMessage } from "@langchain/core/messages";
+import { codeBlock } from "common-tags";
 
 // https://www.anthropic.com/news/contextual-retrieval
 async function situateContext(
@@ -19,22 +20,35 @@ async function situateContext(
     model: BASE_MODEL,
     temperature: 0,
   });
-  const prompt = PromptTemplate.fromTemplate(`
-    <document>
-    {document}
-    </document>
-    
-    Here is the chunk we want to situate within the whole document
+  // We're trying to hit the cache by providing same context on the prefix
+  const message = new HumanMessage({
+    content: [
+      {
+        type: "text",
+        text: codeBlock`
+          <document>
+          ${document}
+          </document>
 
-    <chunk>
-    {chunk}
-    </chunk>
-
-    Please give a short succinct context to situate this chunk within the overall document for the purposes of improving search retrieval of the chunk.
-    Answer only with the succinct context and nothing else.
-  `);
-  const chain = prompt.pipe(model).pipe(new StringOutputParser());
-  const context = await chain.invoke({ document, chunk });
+          Here is the chunk we want to situate within the whole document
+        `,
+      },
+      {
+        type: "text",
+        text: codeBlock`
+          <chunk>
+          ${chunk}
+          </chunk>
+        `,
+      },
+      {
+        type: "text",
+        text: "Please give a short succinct context to situate this chunk within the overall document for the purposes of improving search retrieval of the chunk. Answer only with the succinct context and nothing else.",
+      },
+    ],
+  });
+  const chain = model.pipe(new StringOutputParser());
+  const context = await chain.invoke([message]);
   return `${chunk}\n\n${context}`;
 }
 
@@ -52,7 +66,6 @@ export const embedResource = async (input: NewResourceParams) => {
   try {
     const { content, threadId, title, fileType } =
       insertResourceSchema.parse(input);
-    const chunks = await generateChunks(content);
     const [resource] = await db
       .insert(schema.resources)
       .values({
@@ -62,17 +75,23 @@ export const embedResource = async (input: NewResourceParams) => {
         fileType: fileType,
       })
       .returning();
+    const processChunk = async (content: string, chunk: string) => {
+      const situatedContext = await situateContext(content, chunk);
+      const { embedding } = await generateEmbedding(situatedContext);
+      await db.insert(schema.embeddings).values({
+        resourceId: resource.id,
+        content: situatedContext,
+        embedding: embedding,
+        threadId: threadId,
+      });
+    };
+    const chunks = await generateChunks(content);
+    const [firstChunk, ...remainingChunks] = chunks;
+    // First chunk is processed separately to try and hit the cache
+    await processChunk(content, firstChunk);
+    // Remaining chunks are processed in parallel
     await Promise.all(
-      chunks.map(async (chunk) => {
-        const situatedContext = await situateContext(content, chunk);
-        const { embedding } = await generateEmbedding(situatedContext);
-        await db.insert(schema.embeddings).values({
-          resourceId: resource.id,
-          content: situatedContext,
-          embedding: embedding,
-          threadId: threadId,
-        });
-      })
+      remainingChunks.map((chunk) => processChunk(content, chunk))
     );
     return "Resource successfully created.";
   } catch (e) {
