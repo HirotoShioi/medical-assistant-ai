@@ -65,7 +65,7 @@ export const findRelevantContent = async (
   )})`;
   const similarGuides = await db
     .select({
-      name: schema.embeddings.content,
+      content: schema.embeddings.content,
       similarity,
       embeddingId: schema.embeddings.id,
     })

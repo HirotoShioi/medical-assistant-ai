@@ -1,4 +1,12 @@
+import { BASE_MODEL } from "@/constants";
+import { findRelevantContent } from "@/lib/ai/embeddings";
+import { getModel } from "@/lib/ai/model";
+import { concatMessage } from "@/lib/ai/util";
 import { ThreadSettings } from "@/models";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { Message } from "ai";
+import { z } from "zod";
 
 export interface DocumentGenerator {
   generatorId: string;
@@ -25,37 +33,101 @@ export interface DocumentGenerator {
 // 5. セクションの統合（Section Integration）：
 // 生成された各セクションを統合し、最終的な診断情報提供書を作成します。
 
-export interface ProcessConfig {
+export interface Config {
   sectionName: string;
   threadId: string;
+  messages: Message[];
   prompts: {
-    queryGeneration: string;
-    informationRetrieval: string;
-    textGeneration: string;
+    generateQuery: string;
+    generateSection: string;
+    extractInformation: string;
   };
 }
 
 export interface ISectionProcessor {
-  config: ProcessConfig;
-  generateQueries(): Promise<string[]>;
-  retrieveInformation(queries: string[]): Promise<string[]>;
-  generateSectionContent(content: string): Promise<string>;
-  processSection(): Promise<string>;
+  process(): Promise<string>;
 }
 
 export abstract class BaseSectionProcessor implements ISectionProcessor {
-  abstract config: ProcessConfig;
-  abstract generateQueries(): Promise<string[]>;
-  abstract retrieveInformation(queries: string[]): Promise<string[]>;
-  abstract generateSectionContent(content: string): Promise<string>;
-  async processSection(): Promise<string> {
-    const queries = await this.generateQueries();
-    const content = await this.retrieveInformation(queries);
-    const sectionContent = await this.generateSectionContent(
-      this.concatSectionContent(content)
+  abstract config: Config;
+
+  private async generateQueries(): Promise<string[]> {
+    const model = await getModel({
+      model: BASE_MODEL,
+      temperature: 0,
+    });
+    const template = PromptTemplate.fromTemplate(
+      this.config.prompts.generateQuery
     );
-    return sectionContent;
+    const modelWithSchema = model.withStructuredOutput(
+      z.object({
+        queries: z.array(z.string()),
+      })
+    );
+    const { queries } = await template.pipe(modelWithSchema).invoke({
+      messages: concatMessage(this.config.messages),
+    });
+    return queries;
   }
+
+  private async retrieveInformation(queries: string[]): Promise<string[]> {
+    const contents = await Promise.all(
+      queries.map((query) => findRelevantContent(query, this.config.threadId))
+    );
+    const uniqueContents = contents
+      .flat()
+      .filter(
+        (content, index, self) =>
+          index === self.findIndex((t) => t.embeddingId === content.embeddingId)
+      );
+    return uniqueContents.map((c) => c.content);
+  }
+
+  private async generateSectionContent(content: string): Promise<string> {
+    const model = await getModel({
+      model: BASE_MODEL,
+      temperature: 0,
+    });
+    const template = PromptTemplate.fromTemplate(
+      this.config.prompts.generateSection
+    );
+    const result = await template
+      .pipe(model)
+      .pipe(new StringOutputParser())
+      .invoke({
+        content: content,
+      });
+    return result;
+  }
+
+  private async extractInformation(content: string[]): Promise<string> {
+    const model = await getModel({
+      model: BASE_MODEL,
+      temperature: 0,
+    });
+    const template = PromptTemplate.fromTemplate(
+      this.config.prompts.extractInformation
+    );
+    const result = await template
+      .pipe(model)
+      .pipe(new StringOutputParser())
+      .invoke({
+        messages: concatMessage(this.config.messages),
+        content: this.concatSectionContent(content),
+      });
+    return result;
+  }
+
+  async process(): Promise<string> {
+    const queries = await this.generateQueries();
+    const retrievedContens = await this.retrieveInformation(queries);
+    const extractedInformation = await this.extractInformation(
+      retrievedContens
+    );
+    const result = await this.generateSectionContent(extractedInformation);
+    return result;
+  }
+
   private concatSectionContent(content: string[]): string {
     return content.join("\n");
   }

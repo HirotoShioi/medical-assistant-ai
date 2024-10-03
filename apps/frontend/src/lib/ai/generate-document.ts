@@ -6,6 +6,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { codeBlock } from "common-tags";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { z } from "zod";
+import { concatMessage } from "./util";
 
 type GenerateDocumentParams = {
   documentGenerationPrompt?: string;
@@ -139,7 +140,3 @@ async function cleanseData(messages: Message[], documents: Resource[]) {
     documents: concatDocuments(documents),
   });
 }
-
-const concatMessage = (messages: Message[]) => {
-  return messages.map((m) => `${m.role}: ${m.content}`).join("\n");
-};

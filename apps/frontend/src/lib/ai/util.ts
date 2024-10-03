@@ -69,3 +69,7 @@ function toToolMessage(toolInvocation: ToolInvocation): ToolMessage {
       });
   }
 }
+
+export function concatMessage(messages: Message[]): string {
+  return messages.map((m) => `${m.role}: ${m.content}`).join("\n");
+}

@@ -91,14 +91,14 @@ function getRelavantInformationTool(threadId: string) {
       const contents = await Promise.all(
         queries.map((query) => findRelevantContent(query, threadId))
       );
-      const uniqueContents = contents
+      return contents
         .flat()
         .filter(
           (content, index, self) =>
             index ===
             self.findIndex((t) => t.embeddingId === content.embeddingId)
-        );
-      return uniqueContents;
+        )
+        .map(({ content }) => content);
     },
   });
 }
