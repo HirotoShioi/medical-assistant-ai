@@ -25,11 +25,38 @@ export interface DocumentGenerator {
 // 5. セクションの統合（Section Integration）：
 // 生成された各セクションを統合し、最終的な診断情報提供書を作成します。
 
-// interface ISectionProcessor {
-//   sectionName: string;
-//   generateQueries(): Promise<string[]>;
-//   retrieveInformation(queries: string[]): Promise<string>;
-//   extractStructuredData(retrievedText: string): Promise<any>;
-//   generateSectionContent(structuredData: any): Promise<string>;
-//   processSection(): Promise<string>;
-// }
+export interface ProcessConfig {
+  sectionName: string;
+  threadId: string;
+  prompts: {
+    queryGeneration: string;
+    informationRetrieval: string;
+    textGeneration: string;
+  };
+}
+
+export interface ISectionProcessor {
+  config: ProcessConfig;
+  generateQueries(): Promise<string[]>;
+  retrieveInformation(queries: string[]): Promise<string[]>;
+  generateSectionContent(content: string): Promise<string>;
+  processSection(): Promise<string>;
+}
+
+export abstract class BaseSectionProcessor implements ISectionProcessor {
+  abstract config: ProcessConfig;
+  abstract generateQueries(): Promise<string[]>;
+  abstract retrieveInformation(queries: string[]): Promise<string[]>;
+  abstract generateSectionContent(content: string): Promise<string>;
+  async processSection(): Promise<string> {
+    const queries = await this.generateQueries();
+    const content = await this.retrieveInformation(queries);
+    const sectionContent = await this.generateSectionContent(
+      this.concatSectionContent(content)
+    );
+    return sectionContent;
+  }
+  private concatSectionContent(content: string[]): string {
+    return content.join("\n");
+  }
+}
