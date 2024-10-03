@@ -87,7 +87,9 @@ async function generateSummary(input: string): Promise<string> {
   return summary;
 }
 
-export const embedResource = async (input: NewResourceParams) => {
+export const embedResource = async (
+  input: Omit<NewResourceParams, "summary">
+) => {
   const db = await getDB();
   try {
     const { content, threadId, title, fileType } =

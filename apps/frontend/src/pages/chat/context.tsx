@@ -62,7 +62,6 @@ export function ChatContextProvider({
 
   const { generateDocument, isGeneratingDocument } = useDocumentGenerator(
     thread.id,
-    threadSettings,
     chatHook.append
   );
 
