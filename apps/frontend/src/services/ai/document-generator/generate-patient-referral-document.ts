@@ -11,6 +11,7 @@ import { getMessagesByThreadId } from "@/services/messages/services";
 import { getResourcesByThreadId } from "@/services/resources/service";
 import { Message } from "ai";
 import { codeBlock } from "common-tags";
+
 // 1. 既往歴 <- 入院時のカルテから
 // 入院の経緯 <- 入院時のカルテから
 // 入院後の経過

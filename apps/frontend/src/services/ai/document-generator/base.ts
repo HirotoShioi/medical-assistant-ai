@@ -8,7 +8,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { Message } from "ai";
 import { z } from "zod";
 
-export interface DocumentGenerator {
+interface DocumentGenerator {
   generatorId: string;
   generateDocument: (
     threadId: string,
@@ -21,7 +21,7 @@ type ResourceSummary = {
   summary: string;
 };
 
-export interface Config {
+interface Config {
   sectionName: string;
   threadId: string;
   messages: Message[];
@@ -31,10 +31,6 @@ export interface Config {
     generateSection: string;
     extractInformation: string;
   };
-}
-
-export interface ISectionProcessor {
-  process(): Promise<string>;
 }
 
 // 全てのドキュメントは同じフローで始められる
@@ -53,21 +49,21 @@ export interface ISectionProcessor {
 
 // 5. セクションの統合（Section Integration）：
 // 生成された各セクションを統合し、最終的な診断情報提供書を作成します。
-export abstract class BaseSectionProcessor implements ISectionProcessor {
+// 共通のSectionProcessorクラス
+abstract class BaseSectionProcessor {
   abstract config: Config;
 
+  private async getModel() {
+    return getModel({ model: BASE_MODEL, temperature: 0 });
+  }
+
   private async generateQueries(): Promise<string[]> {
-    const model = await getModel({
-      model: BASE_MODEL,
-      temperature: 0,
-    });
+    const model = await this.getModel();
     const template = PromptTemplate.fromTemplate(
       this.config.prompts.generateQuery
     );
     const modelWithSchema = model.withStructuredOutput(
-      z.object({
-        resourceIds: z.array(z.string()),
-      })
+      z.object({ resourceIds: z.array(z.string()) })
     );
     const { resourceIds } = await template.pipe(modelWithSchema).invoke({
       messages: concatMessage(this.config.messages),
@@ -81,27 +77,19 @@ export abstract class BaseSectionProcessor implements ISectionProcessor {
   }
 
   private async generateSectionContent(content: string): Promise<string> {
-    const model = await getModel({
-      model: BASE_MODEL,
-      temperature: 0,
-    });
+    const model = await this.getModel();
     const template = PromptTemplate.fromTemplate(
       this.config.prompts.generateSection
     );
     const result = await template
       .pipe(model)
       .pipe(new StringOutputParser())
-      .invoke({
-        content: content,
-      });
+      .invoke({ content });
     return result;
   }
 
   private async extractInformation(content: string[]): Promise<string> {
-    const model = await getModel({
-      model: BASE_MODEL,
-      temperature: 0,
-    });
+    const model = await this.getModel();
     const template = PromptTemplate.fromTemplate(
       this.config.prompts.extractInformation
     );
@@ -121,11 +109,13 @@ export abstract class BaseSectionProcessor implements ISectionProcessor {
     const extractedInformation = await this.extractInformation(
       retrievedContents
     );
-    const result = await this.generateSectionContent(extractedInformation);
-    return result;
+    return await this.generateSectionContent(extractedInformation);
   }
 
   private concatSectionContent(content: string[]): string {
     return content.join("\n");
   }
 }
+
+export { BaseSectionProcessor };
+export type { Config, ResourceSummary, DocumentGenerator };
