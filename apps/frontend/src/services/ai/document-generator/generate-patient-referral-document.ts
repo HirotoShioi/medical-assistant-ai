@@ -1,8 +1,14 @@
 // Langchainを用いて診療情報提供を作成する
 // 提供書は4つに分割されているので、AIを用いてそれぞれ作成し、最終的に結合させる
 
-import { BaseSectionProcessor, DocumentGenerator, Config } from "./base";
+import {
+  BaseSectionProcessor,
+  DocumentGenerator,
+  Config,
+  ResourceSummary,
+} from "./base";
 import { getMessagesByThreadId } from "@/services/messages/services";
+import { getResourcesByThreadId } from "@/services/resources/service";
 import { Message } from "ai";
 import { codeBlock } from "common-tags";
 // 1. 既往歴 <- 入院時のカルテから
@@ -29,28 +35,35 @@ import { codeBlock } from "common-tags";
 export class GeneratePatientReferralDocument implements DocumentGenerator {
   generatorId = "generate-patient-referral-document";
   async generateDocument(threadId: string): Promise<string> {
-    const [messages] = await Promise.all([getMessagesByThreadId(threadId)]);
+    const [messages, resourceSummaries] = await Promise.all([
+      getMessagesByThreadId(threadId),
+      getResourcesByThreadId(threadId),
+    ]);
     const [after, before, currentPrescription, pastMedicalFamilyHistory] =
       await Promise.all([
-        courseUntilAdmission.invoke(threadId, messages),
-        beforeAdmissionCourse.invoke(threadId, messages),
-        currentPrescriptions.invoke(threadId, messages),
-        pastMedicalFamilyHistoryProcessor.invoke(threadId, messages),
+        courseUntilAdmission.invoke(threadId, messages, resourceSummaries),
+        beforeAdmissionCourse.invoke(threadId, messages, resourceSummaries),
+        currentPrescriptions.invoke(threadId, messages, resourceSummaries),
+        pastMedicalFamilyHistoryProcessor.invoke(
+          threadId,
+          messages,
+          resourceSummaries
+        ),
       ]);
     return codeBlock`
-    ##入院に至る経緯 ##
+    # 入院に至る経緯
     
     ${before}
 
-    ##入院後の経過 ##
+    # 入院後の経過
     
     ${after}
 
-    ## 現在の処方内容 ##
+    # 現在の処方内容
     
     ${currentPrescription}
 
-    ## 既往歴及び家族歴 ##
+    # 既往歴及び家族歴
     
     ${pastMedicalFamilyHistory}
     `;
@@ -59,11 +72,16 @@ export class GeneratePatientReferralDocument implements DocumentGenerator {
 
 class courseUntilAdmission extends BaseSectionProcessor {
   config: Config;
-  constructor(threadId: string, messages: Message[]) {
+  constructor(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
     super();
     this.config = {
       sectionName: "CourseUntilAdmission",
       messages: messages,
+      resourceSummaries,
       threadId,
       prompts: {
         extractInformation: codeBlock`
@@ -88,15 +106,15 @@ Here's a example of a document that you will created from the above information.
 </Example>
 `,
         generateQuery: codeBlock`
-        You are an expert medical information specialist. Based on the following conversation with the user, please propose three effective search queries to obtain the necessary information to create the "Course Until Admission" section.
+        You are an expert medical information specialist. Based on the following conversation with the user, specify the document IDs that are relevant to the "Course Until Admission" section.
 
 <Conversation with the user>
 {messages}
 </Conversation with the user>
 
-<Instructions>
-- The proposed search queries should be specific and allow you to accurately retrieve the required information.
-- Keep each query concise.
+<Documents>
+{contents}
+</Documents>
 `,
         generateSection: codeBlock`
 You are an excellent medical clerk. Using the following patient information, please create the "Course After Admission" section of the Medical Information Provision Document.
@@ -123,18 +141,31 @@ Generated Section:`,
       },
     };
   }
-  static async invoke(threadId: string, messages: Message[]) {
-    return new courseUntilAdmission(threadId, messages).process();
+  static async invoke(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
+    return new courseUntilAdmission(
+      threadId,
+      messages,
+      resourceSummaries
+    ).process();
   }
 }
 
 class beforeAdmissionCourse extends BaseSectionProcessor {
   config: Config;
-  constructor(threadId: string, messages: Message[]) {
+  constructor(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
     super();
     this.config = {
       sectionName: "BeforeAdmissionCourse",
       messages: messages,
+      resourceSummaries,
       threadId,
       prompts: {
         extractInformation: `
@@ -202,18 +233,31 @@ Generated Section:
       },
     };
   }
-  static async invoke(threadId: string, messages: Message[]) {
-    return new beforeAdmissionCourse(threadId, messages).process();
+  static async invoke(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
+    return new beforeAdmissionCourse(
+      threadId,
+      messages,
+      resourceSummaries
+    ).process();
   }
 }
 
 class currentPrescriptions extends BaseSectionProcessor {
   config: Config;
-  constructor(threadId: string, messages: Message[]) {
+  constructor(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
     super();
     this.config = {
       sectionName: "CurrentPrescriptions",
       messages: messages,
+      resourceSummaries,
       threadId,
       prompts: {
         extractInformation: `
@@ -273,17 +317,30 @@ class currentPrescriptions extends BaseSectionProcessor {
       },
     };
   }
-  static async invoke(threadId: string, messages: Message[]) {
-    return new currentPrescriptions(threadId, messages).process();
+  static async invoke(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
+    return new currentPrescriptions(
+      threadId,
+      messages,
+      resourceSummaries
+    ).process();
   }
 }
 
 class pastMedicalFamilyHistoryProcessor extends BaseSectionProcessor {
   config: Config;
-  constructor(threadId: string, messages: Message[]) {
+  constructor(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
     super();
     this.config = {
       sectionName: "PastMedicalFamilyHistory",
+      resourceSummaries,
       messages: messages,
       threadId,
       prompts: {
@@ -354,7 +411,15 @@ ADL: 杖歩行、食事自立、更衣自立、排泄自立、入浴はヘルパ
       },
     };
   }
-  static async invoke(threadId: string, messages: Message[]) {
-    return new pastMedicalFamilyHistoryProcessor(threadId, messages).process();
+  static async invoke(
+    threadId: string,
+    messages: Message[],
+    resourceSummaries: ResourceSummary[]
+  ) {
+    return new pastMedicalFamilyHistoryProcessor(
+      threadId,
+      messages,
+      resourceSummaries
+    ).process();
   }
 }

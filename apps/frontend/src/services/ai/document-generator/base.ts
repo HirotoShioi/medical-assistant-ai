@@ -1,8 +1,8 @@
 import { BASE_MODEL } from "@/constants";
-import { findRelevantContent } from "@/lib/ai/embeddings";
 import { getModel } from "@/lib/ai/model";
 import { concatMessage } from "@/lib/ai/util";
 import { ThreadSettings } from "@/models";
+import { getResourceByIds } from "@/services/resources/service";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Message } from "ai";
@@ -16,10 +16,16 @@ export interface DocumentGenerator {
   ) => Promise<string>;
 }
 
+type ResourceSummary = {
+  id: string;
+  summary: string;
+};
+
 export interface Config {
   sectionName: string;
   threadId: string;
   messages: Message[];
+  resourceSummaries: ResourceSummary[];
   prompts: {
     generateQuery: string;
     generateSection: string;
@@ -60,26 +66,18 @@ export abstract class BaseSectionProcessor implements ISectionProcessor {
     );
     const modelWithSchema = model.withStructuredOutput(
       z.object({
-        queries: z.array(z.string()),
+        resourceIds: z.array(z.string()),
       })
     );
-    const { queries } = await template.pipe(modelWithSchema).invoke({
+    const { resourceIds } = await template.pipe(modelWithSchema).invoke({
       messages: concatMessage(this.config.messages),
     });
-    return queries;
+    return resourceIds;
   }
 
-  private async retrieveInformation(queries: string[]): Promise<string[]> {
-    const contents = await Promise.all(
-      queries.map((query) => findRelevantContent(query, this.config.threadId))
-    );
-    const uniqueContents = contents
-      .flat()
-      .filter(
-        (content, index, self) =>
-          index === self.findIndex((t) => t.embeddingId === content.embeddingId)
-      );
-    return uniqueContents.map((c) => c.content);
+  private async retrieveInformation(resourceIds: string[]): Promise<string[]> {
+    const resources = await getResourceByIds(resourceIds);
+    return resources.map(({ content }) => content);
   }
 
   private async generateSectionContent(content: string): Promise<string> {

@@ -16,6 +16,7 @@ const resources = pgTable("resources", {
   id: varchar("id", { length: MAX_VARCHAR_LENGTH })
     .primaryKey()
     .$defaultFn(() => nanoid()),
+  summary: text("summary").notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
   fileType: varchar("file_type").notNull(),

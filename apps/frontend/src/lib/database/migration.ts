@@ -31,6 +31,7 @@ export const migrations = [
   );`,
   `CREATE TABLE IF NOT EXISTS "resources" (
     "id" varchar(191) PRIMARY KEY NOT NULL,
+    "summary" text NOT NULL,
     "title" text NOT NULL,
     "thread_id" varchar(191) NOT NULL,
     "file_type" text NOT NULL,

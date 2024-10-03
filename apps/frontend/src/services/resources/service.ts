@@ -4,7 +4,7 @@ import { insertResourceSchema } from "@/lib/database/schema";
 import { schema } from "@/lib/database/schema";
 import { getDB } from "@/lib/database/client";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { getModel } from "@/lib/ai/model";
 import { BASE_MODEL } from "@/constants";
 import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -61,15 +61,43 @@ async function generateChunks(input: string): Promise<string[]> {
   return chunks.map((chunk) => chunk.pageContent);
 }
 
+async function generateSummary(input: string): Promise<string> {
+  const model = await getModel({
+    model: BASE_MODEL,
+    temperature: 0,
+  });
+  const message = new HumanMessage({
+    content: [
+      {
+        type: "text",
+        text: codeBlock`
+          <document>
+          ${input}
+          </document>
+        `,
+      },
+      {
+        type: "text",
+        text: "Please generate a summary of the following document. The summary should be a concise and clear overview of the document's content. The summary should be in a single paragraph and should not exceed 100 words.",
+      },
+    ],
+  });
+  const chain = model.pipe(new StringOutputParser());
+  const summary = await chain.invoke([message]);
+  return summary;
+}
+
 export const embedResource = async (input: NewResourceParams) => {
   const db = await getDB();
   try {
     const { content, threadId, title, fileType } =
       insertResourceSchema.parse(input);
+    const summary = await generateSummary(content);
     const [resource] = await db
       .insert(schema.resources)
       .values({
         content: content,
+        summary: summary,
         threadId: threadId,
         title: title,
         fileType: fileType,
@@ -86,13 +114,8 @@ export const embedResource = async (input: NewResourceParams) => {
       });
     };
     const chunks = await generateChunks(content);
-    const [firstChunk, ...remainingChunks] = chunks;
-    // First chunk is processed separately to try and hit the cache
-    await processChunk(content, firstChunk);
     // Remaining chunks are processed in parallel
-    await Promise.all(
-      remainingChunks.map((chunk) => processChunk(content, chunk))
-    );
+    await Promise.all(chunks.map((chunk) => processChunk(content, chunk)));
     return "Resource successfully created.";
   } catch (e) {
     if (e instanceof Error)
@@ -115,4 +138,12 @@ export const getResourcesByThreadId = async (threadId: string) => {
     .from(schema.resources)
     .where(eq(schema.resources.threadId, threadId))
     .orderBy(desc(schema.resources.createdAt));
+};
+
+export const getResourceByIds = async (ids: string[]) => {
+  const db = await getDB();
+  return db
+    .select()
+    .from(schema.resources)
+    .where(inArray(schema.resources.id, ids));
 };
