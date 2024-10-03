@@ -21,16 +21,18 @@ type ResourceSummary = {
   summary: string;
 };
 
+type Prompts = {
+  extractInformation: string;
+  generateQuery: string;
+  generateSection: string;
+};
+
 interface Config {
   sectionName: string;
   threadId: string;
   messages: Message[];
   resourceSummaries: ResourceSummary[];
-  prompts: {
-    generateQuery: string;
-    generateSection: string;
-    extractInformation: string;
-  };
+  prompts: Prompts;
 }
 
 // 全てのドキュメントは同じフローで始められる
@@ -50,8 +52,12 @@ interface Config {
 // 5. セクションの統合（Section Integration）：
 // 生成された各セクションを統合し、最終的な診断情報提供書を作成します。
 // 共通のSectionProcessorクラス
-abstract class BaseSectionProcessor {
-  abstract config: Config;
+class BaseSectionProcessor {
+  readonly config: Config;
+
+  constructor(config: Config) {
+    this.config = config;
+  }
 
   private async getModel() {
     return getModel({ model: BASE_MODEL, temperature: 0 });
@@ -117,5 +123,9 @@ abstract class BaseSectionProcessor {
   }
 }
 
-export { BaseSectionProcessor };
-export type { Config, ResourceSummary, DocumentGenerator };
+async function generateSectionContent(config: Config): Promise<string> {
+  const processor = new BaseSectionProcessor(config);
+  return processor.process();
+}
+export { generateSectionContent };
+export type { Config, ResourceSummary, DocumentGenerator, Prompts };

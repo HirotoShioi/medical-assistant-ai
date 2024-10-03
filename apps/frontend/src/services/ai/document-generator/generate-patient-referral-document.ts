@@ -1,16 +1,11 @@
 // Langchainを用いて診療情報提供を作成する
 // 提供書は4つに分割されているので、AIを用いてそれぞれ作成し、最終的に結合させる
 
-import {
-  BaseSectionProcessor,
-  DocumentGenerator,
-  Config,
-  ResourceSummary,
-} from "./base";
+import { DocumentGenerator } from "./base";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getResourcesByThreadId } from "@/services/resources/service";
-import { Message } from "ai";
 import { codeBlock } from "common-tags";
+import { generateSectionContent, Prompts } from "./base";
 
 // 1. 既往歴 <- 入院時のカルテから
 // 入院の経緯 <- 入院時のカルテから
@@ -40,16 +35,21 @@ export class GeneratePatientReferralDocument implements DocumentGenerator {
       getMessagesByThreadId(threadId),
       getResourcesByThreadId(threadId),
     ]);
+    const generate = async (sectionName: string, prompts: Prompts) => {
+      return generateSectionContent({
+        sectionName,
+        threadId,
+        messages,
+        resourceSummaries,
+        prompts,
+      });
+    };
     const [after, before, currentPrescription, pastMedicalFamilyHistory] =
       await Promise.all([
-        courseUntilAdmission.invoke(threadId, messages, resourceSummaries),
-        beforeAdmissionCourse.invoke(threadId, messages, resourceSummaries),
-        currentPrescriptions.invoke(threadId, messages, resourceSummaries),
-        pastMedicalFamilyHistoryProcessor.invoke(
-          threadId,
-          messages,
-          resourceSummaries
-        ),
+        generate("CourseUntilAdmission", courseUntilAdmissionPrompts),
+        generate("BeforeAdmissionCourse", beforeAdmissionCoursePrompts),
+        generate("CurrentPrescription", currentPrescriptionPrompts),
+        generate("PastMedicalFamilyHistory", pastMedicalFamilyHistoryPrompts),
       ]);
     return codeBlock`
     # 入院に至る経緯
@@ -71,22 +71,9 @@ export class GeneratePatientReferralDocument implements DocumentGenerator {
   }
 }
 
-class courseUntilAdmission extends BaseSectionProcessor {
-  config: Config;
-  constructor(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    super();
-    this.config = {
-      sectionName: "CourseUntilAdmission",
-      messages: messages,
-      resourceSummaries,
-      threadId,
-      prompts: {
-        extractInformation: codeBlock`
-        You are an expert medical information specialist. From the following text, please extract the information necessary to create the "Course After Admission" section.
+const courseUntilAdmissionPrompts: Prompts = {
+  extractInformation: codeBlock`
+    You are an expert medical information specialist. From the following text, please extract the information necessary to create the "Course After Admission" section.
 
 <Chat History>
 {messages}
@@ -106,8 +93,8 @@ Here's a example of a document that you will created from the above information.
 入院翌日から徐々に意識レベルは改善し、入院3日目（7月23日）には簡単な会話ができるようになりましたが、現在も認識障害が続いており、簡単な会話のみが可能です。アルコール性認知症やコルサコフ症候群が疑われています。
 </Example>
 `,
-        generateQuery: codeBlock`
-        You are an expert medical information specialist. Based on the following conversation with the user, specify the document IDs that are relevant to the "Course Until Admission" section.
+  generateQuery: codeBlock`
+    You are an expert medical information specialist. Based on the following conversation with the user, specify the document IDs that are relevant to the "Course Until Admission" section.
 
 <Conversation with the user>
 {messages}
@@ -117,7 +104,7 @@ Here's a example of a document that you will created from the above information.
 {contents}
 </Documents>
 `,
-        generateSection: codeBlock`
+  generateSection: codeBlock`
 You are an excellent medical clerk. Using the following patient information, please create the "Course After Admission" section of the Medical Information Provision Document.
 
 <Patient Information>
@@ -139,37 +126,10 @@ You are an excellent medical clerk. Using the following patient information, ple
 - Conclude with the following statement: "以上、簡単ではございますが当院での加療内容となります。不足の情報がございましたら、気兼ねなくご連絡いただけますと幸いです。<Patient Name>殿の引き続きの御加療を何卒よろしくお願い申し上げます。"
 </Instructions>
 Generated Section:`,
-      },
-    };
-  }
-  static async invoke(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    return new courseUntilAdmission(
-      threadId,
-      messages,
-      resourceSummaries
-    ).process();
-  }
-}
+};
 
-class beforeAdmissionCourse extends BaseSectionProcessor {
-  config: Config;
-  constructor(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    super();
-    this.config = {
-      sectionName: "BeforeAdmissionCourse",
-      messages: messages,
-      resourceSummaries,
-      threadId,
-      prompts: {
-        extractInformation: `
+const beforeAdmissionCoursePrompts: Prompts = {
+  extractInformation: `
 You are an expert medical information specialist. From the following text, please extract the necessary information to create the "Course Until Admission" section.
 
 <Chat History>
@@ -192,8 +152,8 @@ Here is an example of the type of document you will create from the above inform
 呼びかけに応答はなく、従命が通らない状態で、顔面には大量の小さい虫が這っているような状況でした。そのため、救急搬送され当科に入院となりました。
 当院到着時にはほとんど従命が入らず、発話もほぼできず、意思疎通が不可能な状態でした。
 </Example>
-        `,
-        generateQuery: `
+  `,
+  generateQuery: `
 You are an expert medical information specialist. Based on the following conversation with the user, please propose three effective search queries to obtain the necessary information to create the "Course Until Admission" section.
 
 <Conversation with the user>
@@ -204,8 +164,8 @@ You are an expert medical information specialist. Based on the following convers
 - The proposed search queries should be specific and allow you to accurately retrieve the required information.
 - Keep each query concise.
 </Instructions>
-        `,
-        generateSection: `
+  `,
+  generateSection: `
 You are an excellent medical clerk. Using the following patient information, please create the "Course Until Admission" section of the Medical Information Provision Document.
 
 <Patient Information>
@@ -230,38 +190,11 @@ You are an excellent medical clerk. Using the following patient information, ple
 </Instructions>
 
 Generated Section:
-        `,
-      },
-    };
-  }
-  static async invoke(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    return new beforeAdmissionCourse(
-      threadId,
-      messages,
-      resourceSummaries
-    ).process();
-  }
-}
+  `,
+};
 
-class currentPrescriptions extends BaseSectionProcessor {
-  config: Config;
-  constructor(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    super();
-    this.config = {
-      sectionName: "CurrentPrescriptions",
-      messages: messages,
-      resourceSummaries,
-      threadId,
-      prompts: {
-        extractInformation: `
+const currentPrescriptionPrompts: Prompts = {
+  extractInformation: `
 あなたは優秀な医療情報専門家です。以下のテキストから、「現在の処方」セクションを作成するために必要な情報を抽出してください。
 
 <チャット履歴>
@@ -280,8 +213,8 @@ class currentPrescriptions extends BaseSectionProcessor {
 - デエビゴ2.5mg 1T 1x 就寝前（良眠時スキップ可）
 - マグミット330mg 3T 3x 朝昼夕食後（軟便時スキップ可）
 </例>
-        `,
-        generateQuery: `
+  `,
+  generateQuery: `
 あなたは優秀な医療情報専門家です。以下のユーザーとの会話内容に基づいて、「現在の処方」セクションを作成するために必要な情報を得るための効果的な検索クエリを3つ提案してください。
 
 <ユーザーとの会話内容>
@@ -292,8 +225,8 @@ class currentPrescriptions extends BaseSectionProcessor {
 - 提案する検索クエリは具体的で、必要な情報を正確に取得できるものとしてください。
 - 各クエリは簡潔に記載してください。
 </指示>
-        `,
-        generateSection: `
+  `,
+  generateSection: `
 あなたは優秀な医療事務員です。以下の患者の処方情報を用いて、診断情報提供書の「現在の処方」セクションを作成してください。
 
 <処方情報>
@@ -314,38 +247,11 @@ class currentPrescriptions extends BaseSectionProcessor {
 </指示>
 
 作成されたセクション：
-        `,
-      },
-    };
-  }
-  static async invoke(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    return new currentPrescriptions(
-      threadId,
-      messages,
-      resourceSummaries
-    ).process();
-  }
-}
+  `,
+};
 
-class pastMedicalFamilyHistoryProcessor extends BaseSectionProcessor {
-  config: Config;
-  constructor(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    super();
-    this.config = {
-      sectionName: "PastMedicalFamilyHistory",
-      resourceSummaries,
-      messages: messages,
-      threadId,
-      prompts: {
-        extractInformation: `
+const pastMedicalFamilyHistoryPrompts: Prompts = {
+  extractInformation: `
 あなたは優秀な医療情報専門家です。以下のテキストから、「既往歴および家族歴」セクションを作成するために必要な情報を抽出してください。
 
 <チャット履歴>
@@ -369,8 +275,8 @@ class pastMedicalFamilyHistoryProcessor extends BaseSectionProcessor {
 同居: 独居
 ADL: 杖歩行、食事自立、更衣自立、排泄自立、入浴はヘルパー
 </例>
-        `,
-        generateQuery: `
+  `,
+  generateQuery: `
 あなたは優秀な医療情報専門家です。以下のユーザーとの会話内容に基づいて、「既往歴および家族歴」セクションを作成するために必要な情報を得るための効果的な検索クエリを3つ提案してください。
 
 <ユーザーとの会話内容>
@@ -381,8 +287,8 @@ ADL: 杖歩行、食事自立、更衣自立、排泄自立、入浴はヘルパ
 - 提案する検索クエリは具体的で、必要な情報を正確に取得できるものとしてください。
 - 各クエリは簡潔に記載してください。
 </指示>
-        `,
-        generateSection: `
+  `,
+  generateSection: `
 あなたは優秀な医療事務員です。以下の患者情報を用いて、診断情報提供書の「既往歴および家族歴」セクションを作成してください。
 
 <患者情報>
@@ -407,20 +313,5 @@ ADL: 杖歩行、食事自立、更衣自立、排泄自立、入浴はヘルパ
 - 必要に応じて特記事項を含めてください。
 </指示>
 
-作成されたセクション：
-        `,
-      },
-    };
-  }
-  static async invoke(
-    threadId: string,
-    messages: Message[],
-    resourceSummaries: ResourceSummary[]
-  ) {
-    return new pastMedicalFamilyHistoryProcessor(
-      threadId,
-      messages,
-      resourceSummaries
-    ).process();
-  }
-}
+作成されたセクション：`,
+};
