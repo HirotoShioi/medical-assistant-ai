@@ -1,5 +1,5 @@
 import { getModel } from "@/lib/ai/model";
-import { generateSection, GenerateSectionParams } from "./sectionGenerator";
+import { generateSection, GenerateSectionParams } from "./section-generator";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { getResourcesByThreadId } from "@/services/resources/service";
