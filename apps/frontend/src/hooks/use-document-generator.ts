@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { GeneratePatientReferralDocument } from "@/services/ai/document-generator/generate-patient-referral-document";
+import { generatePatientReferralDocument } from "@/services/ai/document-generator/generate-patient-referral-document";
 import { nanoid } from "nanoid";
 import { Message } from "ai/react";
 
@@ -11,8 +11,7 @@ export function useDocumentGenerator(
 
   const generateDocument = useMutation({
     mutationFn: async () => {
-      const generator = new GeneratePatientReferralDocument();
-      const result = await generator.generateDocument(threadId);
+      const result = await generatePatientReferralDocument(threadId);
       const message: Message = {
         id: nanoid(),
         role: "assistant",
