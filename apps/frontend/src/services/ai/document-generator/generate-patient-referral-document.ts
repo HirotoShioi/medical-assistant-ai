@@ -30,13 +30,30 @@ export class GeneratePatientReferralDocument implements DocumentGenerator {
   generatorId = "generate-patient-referral-document";
   async generateDocument(threadId: string): Promise<string> {
     const [messages] = await Promise.all([getMessagesByThreadId(threadId)]);
-    const course = await courseUntilAdmission.invoke(threadId, messages);
-    // const currentMedication = new CurrentMedication(threadId, messages);
-    // const pastHistoryAndFamilyHistory = new PastHistoryAndFamilyHistory(
-    //   threadId,
-    //   messages
-    // );
-    return course;
+    const [after, before, currentPrescription, pastMedicalFamilyHistory] =
+      await Promise.all([
+        courseUntilAdmission.invoke(threadId, messages),
+        beforeAdmissionCourse.invoke(threadId, messages),
+        currentPrescriptions.invoke(threadId, messages),
+        pastMedicalFamilyHistoryProcessor.invoke(threadId, messages),
+      ]);
+    return codeBlock`
+    ##入院に至る経緯 ##
+    
+    ${before}
+
+    ##入院後の経過 ##
+    
+    ${after}
+
+    ## 現在の処方内容 ##
+    
+    ${currentPrescription}
+
+    ## 既往歴及び家族歴 ##
+    
+    ${pastMedicalFamilyHistory}
+    `;
   }
 }
 
@@ -108,5 +125,236 @@ Generated Section:`,
   }
   static async invoke(threadId: string, messages: Message[]) {
     return new courseUntilAdmission(threadId, messages).process();
+  }
+}
+
+class beforeAdmissionCourse extends BaseSectionProcessor {
+  config: Config;
+  constructor(threadId: string, messages: Message[]) {
+    super();
+    this.config = {
+      sectionName: "BeforeAdmissionCourse",
+      messages: messages,
+      threadId,
+      prompts: {
+        extractInformation: `
+You are an expert medical information specialist. From the following text, please extract the necessary information to create the "Course Until Admission" section.
+
+<Chat History>
+{messages}
+</Chat History>
+
+<Uploaded Documents>
+{contents}
+</Uploaded Documents>
+
+Here is an example of the type of document you will create from the above information:
+
+<Example>
+平素よりお世話になっております。 この度は患者様のお受け入れを頂き、誠にありがとうございます。当院の7月20日から8月28日までの入院経過について、
+情報提供させていただきます。 患者様はアルコール多飲歴、胃静脈瘤破裂などの既往があり、前医の鴨川国保病院がかかりつけの、独居・70歳男性
+（元血液内科医）です。ADLはかろうじて自立しておりました。入院1週間前までは、KPである姪御さんとSNSで会話ができていましたが、
+入院3日前に近所のスーパーで「老人がフラフラしている」との通報があり、病院受診が提案されましたが、患者様は強く拒否しました。
+周囲の制止も振り切り、自分で車を運転し自宅に向かう途中、木に衝突しました。その際も救急搬送が提案されましたが、拒否しておりました。 
+入院当日（7月21日）、救急隊および警察が安否確認のため自宅を訪れたところ、患者様が自宅の壁とベッドの間で動けなくなっているのを発見。
+呼びかけに応答はなく、従命が通らない状態で、顔面には大量の小さい虫が這っているような状況でした。そのため、救急搬送され当科に入院となりました。
+当院到着時にはほとんど従命が入らず、発話もほぼできず、意思疎通が不可能な状態でした。
+</Example>
+        `,
+        generateQuery: `
+You are an expert medical information specialist. Based on the following conversation with the user, please propose three effective search queries to obtain the necessary information to create the "Course Until Admission" section.
+
+<Conversation with the user>
+{messages}
+</Conversation with the user>
+
+<Instructions>
+- The proposed search queries should be specific and allow you to accurately retrieve the required information.
+- Keep each query concise.
+</Instructions>
+        `,
+        generateSection: `
+You are an excellent medical clerk. Using the following patient information, please create the "Course Until Admission" section of the Medical Information Provision Document.
+
+<Patient Information>
+{content}
+</Patient Information>
+
+<Example>
+平素よりお世話になっております。 この度は患者様のお受け入れを頂き、誠にありがとうございます。当院の7月20日から8月28日までの入院経過について、
+情報提供させていただきます。 患者様はアルコール多飲歴、胃静脈瘤破裂などの既往があり、前医の鴨川国保病院がかかりつけの、独居・70歳男性
+（元血液内科医）です。ADLはかろうじて自立しておりました。入院1週間前までは、KPである姪御さんとSNSで会話ができていましたが、
+入院3日前に近所のスーパーで「老人がフラフラしている」との通報があり、病院受診が提案されましたが、患者様は強く拒否しました。
+周囲の制止も振り切り、自分で車を運転し自宅に向かう途中、木に衝突しました。その際も救急搬送が提案されましたが、拒否しておりました。 
+入院当日（7月21日）、救急隊および警察が安否確認のため自宅を訪れたところ、患者様が自宅の壁とベッドの間で動けなくなっているのを発見。
+呼びかけに応答はなく、従命が通らない状態で、顔面には大量の小さい虫が這っているような状況でした。そのため、救急搬送され当科に入院となりました。
+当院到着時にはほとんど従命が入らず、発話もほぼできず、意思疎通が不可能な状態でした。
+</Example>
+
+<Instructions>
+- Write in a polite and formal style.
+- Include necessary details such as the reason for admission, ADL at admission, date and symptoms (chief complaint), medical facility visited, diagnosis, and department admitted to.
+- Follow the prescribed format and enhance readability.
+</Instructions>
+
+Generated Section:
+        `,
+      },
+    };
+  }
+  static async invoke(threadId: string, messages: Message[]) {
+    return new beforeAdmissionCourse(threadId, messages).process();
+  }
+}
+
+class currentPrescriptions extends BaseSectionProcessor {
+  config: Config;
+  constructor(threadId: string, messages: Message[]) {
+    super();
+    this.config = {
+      sectionName: "CurrentPrescriptions",
+      messages: messages,
+      threadId,
+      prompts: {
+        extractInformation: `
+あなたは優秀な医療情報専門家です。以下のテキストから、「現在の処方」セクションを作成するために必要な情報を抽出してください。
+
+<チャット履歴>
+{messages}
+</チャット履歴>
+
+<アップロードされたドキュメント>
+{contents}
+</アップロードされたドキュメント>
+
+以下は、上記の情報から作成されるドキュメントの例です。
+
+<例>
+- タケキャブ20mg 1T 1x 朝食後
+- アリナミンF 25mg 3T 3x 朝昼夕食後
+- デエビゴ2.5mg 1T 1x 就寝前（良眠時スキップ可）
+- マグミット330mg 3T 3x 朝昼夕食後（軟便時スキップ可）
+</例>
+        `,
+        generateQuery: `
+あなたは優秀な医療情報専門家です。以下のユーザーとの会話内容に基づいて、「現在の処方」セクションを作成するために必要な情報を得るための効果的な検索クエリを3つ提案してください。
+
+<ユーザーとの会話内容>
+{messages}
+</ユーザーとの会話内容>
+
+<指示>
+- 提案する検索クエリは具体的で、必要な情報を正確に取得できるものとしてください。
+- 各クエリは簡潔に記載してください。
+</指示>
+        `,
+        generateSection: `
+あなたは優秀な医療事務員です。以下の患者の処方情報を用いて、診断情報提供書の「現在の処方」セクションを作成してください。
+
+<処方情報>
+{content}
+</処方情報>
+
+<例>
+- タケキャブ20mg 1T 1x 朝食後
+- アリナミンF 25mg 3T 3x 朝昼夕食後
+- デエビゴ2.5mg 1T 1x 就寝前（良眠時スキップ可）
+- マグミット330mg 3T 3x 朝昼夕食後（軟便時スキップ可）
+</例>
+
+<指示>
+- 薬剤名、用量、1回あたりの処方量、1日に処方される回数、および服用時間を記載してください。
+- 必要に応じて特記事項を括弧内に記載してください。
+- 箇条書きでわかりやすく記載してください。
+</指示>
+
+作成されたセクション：
+        `,
+      },
+    };
+  }
+  static async invoke(threadId: string, messages: Message[]) {
+    return new currentPrescriptions(threadId, messages).process();
+  }
+}
+
+class pastMedicalFamilyHistoryProcessor extends BaseSectionProcessor {
+  config: Config;
+  constructor(threadId: string, messages: Message[]) {
+    super();
+    this.config = {
+      sectionName: "PastMedicalFamilyHistory",
+      messages: messages,
+      threadId,
+      prompts: {
+        extractInformation: `
+あなたは優秀な医療情報専門家です。以下のテキストから、「既往歴および家族歴」セクションを作成するために必要な情報を抽出してください。
+
+<チャット履歴>
+{messages}
+</チャット履歴>
+
+<アップロードされたドキュメント>
+{contents}
+</アップロードされたドキュメント>
+
+以下は、上記の情報から作成されるドキュメントの例です。
+
+<例>
+【既往歴/併存症】
+両側乳癌術後、高血圧症、慢性心不全、Moderate AR/MR/TR、腹部大動脈瘤、鉄欠乏性貧血、脂質異常症、食道裂孔ヘルニア、大腸ポリープ、腰痛症、脊柱管狭窄症、骨粗鬆症、不眠症、胃潰瘍、めまい症
+【アレルギー】
+なし
+【生活歴】
+飲酒: なし
+喫煙: 40本×40年（2006年禁煙）
+同居: 独居
+ADL: 杖歩行、食事自立、更衣自立、排泄自立、入浴はヘルパー
+</例>
+        `,
+        generateQuery: `
+あなたは優秀な医療情報専門家です。以下のユーザーとの会話内容に基づいて、「既往歴および家族歴」セクションを作成するために必要な情報を得るための効果的な検索クエリを3つ提案してください。
+
+<ユーザーとの会話内容>
+{messages}
+</ユーザーとの会話内容>
+
+<指示>
+- 提案する検索クエリは具体的で、必要な情報を正確に取得できるものとしてください。
+- 各クエリは簡潔に記載してください。
+</指示>
+        `,
+        generateSection: `
+あなたは優秀な医療事務員です。以下の患者情報を用いて、診断情報提供書の「既往歴および家族歴」セクションを作成してください。
+
+<患者情報>
+{content}
+</患者情報>
+
+<例>
+【既往歴/併存症】
+両側乳癌術後、高血圧症、慢性心不全、Moderate AR/MR/TR、腹部大動脈瘤、鉄欠乏性貧血、脂質異常症、食道裂孔ヘルニア、大腸ポリープ、腰痛症、脊柱管狭窄症、骨粗鬆症、不眠症、胃潰瘍、めまい症
+【アレルギー】
+なし
+【生活歴】
+飲酒: なし
+喫煙: 40本×40年（2006年禁煙）
+同居: 独居
+ADL: 杖歩行、食事自立、更衣自立、排泄自立、入浴はヘルパー
+</例>
+
+<指示>
+- 患者の既往歴、家族歴、アレルギー、生活歴（飲酒、喫煙、同居状況、ADLなど）を記載してください。
+- 箇条書きや見出しを使用して、情報を整理してください。
+- 必要に応じて特記事項を含めてください。
+</指示>
+
+作成されたセクション：
+        `,
+      },
+    };
+  }
+  static async invoke(threadId: string, messages: Message[]) {
+    return new pastMedicalFamilyHistoryProcessor(threadId, messages).process();
   }
 }

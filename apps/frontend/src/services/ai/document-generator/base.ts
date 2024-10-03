@@ -16,6 +16,21 @@ export interface DocumentGenerator {
   ) => Promise<string>;
 }
 
+export interface Config {
+  sectionName: string;
+  threadId: string;
+  messages: Message[];
+  prompts: {
+    generateQuery: string;
+    generateSection: string;
+    extractInformation: string;
+  };
+}
+
+export interface ISectionProcessor {
+  process(): Promise<string>;
+}
+
 // 全てのドキュメントは同じフローで始められる
 // 1. クエリ生成（Query Generation）：
 // AIに各セクションに必要な情報を得るための検索クエリを生成してもらいます。
@@ -32,22 +47,6 @@ export interface DocumentGenerator {
 
 // 5. セクションの統合（Section Integration）：
 // 生成された各セクションを統合し、最終的な診断情報提供書を作成します。
-
-export interface Config {
-  sectionName: string;
-  threadId: string;
-  messages: Message[];
-  prompts: {
-    generateQuery: string;
-    generateSection: string;
-    extractInformation: string;
-  };
-}
-
-export interface ISectionProcessor {
-  process(): Promise<string>;
-}
-
 export abstract class BaseSectionProcessor implements ISectionProcessor {
   abstract config: Config;
 
@@ -120,9 +119,9 @@ export abstract class BaseSectionProcessor implements ISectionProcessor {
 
   async process(): Promise<string> {
     const queries = await this.generateQueries();
-    const retrievedContens = await this.retrieveInformation(queries);
+    const retrievedContents = await this.retrieveInformation(queries);
     const extractedInformation = await this.extractInformation(
-      retrievedContens
+      retrievedContents
     );
     const result = await this.generateSectionContent(extractedInformation);
     return result;
