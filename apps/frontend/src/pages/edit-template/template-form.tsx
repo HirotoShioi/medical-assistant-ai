@@ -48,9 +48,13 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
     initialAssistantMessage: z.string().min(1).max(1600, {
       message: "初期メッセージは1600文字以内で入力してください。",
     }),
-    reportGenerationPrompt: z.string().min(1).max(600, {
-      message: "書類作成時に気をつけるべき点は600文字以内で入力してください。",
-    }).nullable(),
+    reportGenerationPrompt: z
+      .string()
+      .max(600, {
+        message:
+          "書類作成時に気をつけるべき点は600文字以内で入力してください。",
+      })
+      .nullable(),
   });
   const form = useForm<TemplateFormData>({
     resolver: zodResolver(schema),
@@ -185,25 +189,29 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
             {template?.type === "report" && (
               <div className="space-y-2">
                 <FormField
-                control={form.control}
-                name="reportGenerationPrompt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("templateForm.reportGenerationPromptLabel")}</FormLabel>
-                    <FormDescription>
-                      {t('templateForm.reportGenerationPromptDescription')}
-                    </FormDescription>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={15}
-                        className="resize-none"
-                        placeholder={t("templateForm.reportGenerationPromptPlaceholder")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                  control={form.control}
+                  name="reportGenerationPrompt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("templateForm.reportGenerationPromptLabel")}
+                      </FormLabel>
+                      <FormDescription>
+                        {t("templateForm.reportGenerationPromptDescription")}
+                      </FormDescription>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          rows={15}
+                          className="resize-none"
+                          placeholder={t(
+                            "templateForm.reportGenerationPromptPlaceholder"
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
             )}

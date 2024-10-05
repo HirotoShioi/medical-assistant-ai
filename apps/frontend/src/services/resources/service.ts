@@ -92,9 +92,12 @@ export const embedResource = async (
 ) => {
   const db = await getDB();
   try {
+    const summary = await generateSummary(input.content);
     const { content, threadId, title, fileType } =
-      insertResourceSchema.parse(input);
-    const summary = await generateSummary(content);
+      insertResourceSchema.parse({
+        ...input,
+        summary: summary,
+      });
     const [resource] = await db
       .insert(schema.resources)
       .values({
@@ -120,6 +123,7 @@ export const embedResource = async (
     await Promise.all(chunks.map((chunk) => processChunk(content, chunk)));
     return "Resource successfully created.";
   } catch (e) {
+    console.error(e);
     if (e instanceof Error)
       return e.message.length > 0 ? e.message : "Error, please try again.";
   }
