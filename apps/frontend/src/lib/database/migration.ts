@@ -87,6 +87,12 @@ export const migrations = [
     "created_at" timestamp DEFAULT now() NOT NULL,
     "updated_at" timestamp DEFAULT now() NOT NULL
   );`,
+  `CREATE TABLE IF NOT EXISTS "user_preferences" (
+    "id" varchar(191) PRIMARY KEY NOT NULL,
+    "llm_model" text NOT NULL,
+    "created_at" timestamp DEFAULT now() NOT NULL,
+    "updated_at" timestamp DEFAULT now() NOT NULL
+  );`,
 ];
 
 async function createHash(str: string) {
@@ -137,5 +143,9 @@ export async function applyMigrations(pglite: PGliteWorker) {
         originalTemplate: JSON.stringify(t),
       }))
     );
+    await db.insert(schema.userPreferences).values({
+      id: nanoid(),
+      llmModel: "gpt-4o-mini",
+    });
   }
 }

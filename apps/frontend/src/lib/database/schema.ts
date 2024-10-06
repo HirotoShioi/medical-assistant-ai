@@ -161,6 +161,19 @@ const threadSettings = pgTable("thread_settings", {
     .notNull(),
 });
 
+const userPreferences = pgTable("user_preferences", {
+  id: varchar("id", { length: MAX_VARCHAR_LENGTH })
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+  llmModel: text("llm_model").notNull(),
+  createdAt: timestamp("created_at")
+    .default(sql`now()`)
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .default(sql`now()`)
+    .notNull(),
+});
+
 const insertThreadSettingsSchema = createInsertSchema(threadSettings).omit({
   id: true,
   createdAt: true,
@@ -174,6 +187,7 @@ export const schema = {
   threads,
   templates,
   threadSettings,
+  userPreferences,
 };
 
 export {

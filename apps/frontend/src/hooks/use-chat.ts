@@ -4,13 +4,14 @@ import { saveMessage } from "@/services/messages";
 import { createOpenAI } from "@ai-sdk/openai";
 import { z } from "zod";
 import { findRelevantContent } from "@/lib/ai/embeddings";
-import { BASE_MODEL, MAX_STEPS_FOR_TOOL_CALLS } from "@/constants";
+import { MAX_STEPS_FOR_TOOL_CALLS } from "@/constants";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getResourcesByThreadId } from "@/services/resources/service";
 import { generateDocument } from "@/lib/ai/generate-document";
 import { codeBlock } from "common-tags";
+import { getUserPreferences } from "@/services/user/service";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -55,12 +56,15 @@ async function handleChat(req: Request) {
   if (!session.tokens?.idToken) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const settings = await getThreadSettingsById(threadId);
+  const [settings, userPreferences] = await Promise.all([
+    getThreadSettingsById(threadId),
+    getUserPreferences(),
+  ]);
   const { messages } = body as { messages: any[] };
   const model = createOpenAI({
     apiKey: session.tokens.idToken.toString(),
     baseURL: import.meta.env.VITE_API_URL,
-  }).chat(BASE_MODEL);
+  }).chat(userPreferences.llmModel);
   const result = await streamText({
     model: model,
     system: codeBlock`現在の日付は: ${new Date().toLocaleDateString()}です。

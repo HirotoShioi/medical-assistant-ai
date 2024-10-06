@@ -14,11 +14,26 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useDeleteThreadMutation } from "@/services/threads/mutations";
-
+import { useUpdateUserPreferencesMutation } from "@/services/user/mutations";
+import { useUserPreferencesQuery } from "@/services/user/queries";
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const { openAlert } = useAlert();
+  const { data: userPreferences } = useUserPreferencesQuery();
+  const { mutateAsync } = useUpdateUserPreferencesMutation();
   const { mutateAsync: deleteThread } = useDeleteThreadMutation();
+  const models = [
+    {
+      name: "GPT-4o-mini",
+      value: "gpt-4o-mini",
+      description: t("settings.gpt4oMiniDescription"),
+    },
+    {
+      name: "GPT-4o",
+      value: "gpt-4o",
+      description: t("settings.gpt4oDescription"),
+    },
+  ];
   async function handleDeleteDatabase() {
     indexedDB.deleteDatabase(`/pglite/${DB_NAME}`);
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -127,6 +142,37 @@ export default function SettingsPage() {
                   <SelectContent>
                     <SelectItem value="ja">日本語</SelectItem>
                     <SelectItem value="en">English</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="delete-database" className="text-lg font-medium">
+                {t("settings.llmModel")}
+              </Label>
+              <div className="flex items-center">
+                <Select
+                  defaultValue={userPreferences?.llmModel ?? "gpt-4o-mini"}
+                  onValueChange={(value) => mutateAsync({ llmModel: value })}
+                >
+                  <SelectTrigger>
+                    {
+                      models.find(
+                        (model) => model.value === userPreferences?.llmModel
+                      )?.name
+                    }
+                  </SelectTrigger>
+                  <SelectContent>
+                    {models.map((model) => (
+                      <SelectItem key={model.value} value={model.value}>
+                        <div className="flex flex-col gap-1">
+                          <p>{model.name}</p>
+                          <p className="text-sm text-gray-500">
+                            {model.description}
+                          </p>
+                        </div>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

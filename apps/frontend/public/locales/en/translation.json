@@ -12,7 +12,10 @@
     "deleteThreads": "Delete Threads",
     "threadsDeleted": "Delete completed",
     "threadsDeletedDescription": "Your chat history has been deleted.",
-    "deleteThreadsConfirmation": "Are you sure you want to delete your chat history? Deleting your chat history will also delete all your conversations and related documents."
+    "deleteThreadsConfirmation": "Are you sure you want to delete your chat history? Deleting your chat history will also delete all your conversations and related documents.",
+    "llmModel": "AI Model",
+    "gpt4oMiniDescription": "A lightweight model suitable for daily tasks",
+    "gpt4oDescription": "A high-performance model capable of generating high-quality reports"
   },
   "notFound": {
     "title": "404",
