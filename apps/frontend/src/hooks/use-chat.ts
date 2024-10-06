@@ -10,6 +10,7 @@ import { getThreadSettingsById } from "@/services/threads/service";
 import { getMessagesByThreadId } from "@/services/messages/services";
 import { getResourcesByThreadId } from "@/services/resources/service";
 import { generateDocument } from "@/lib/ai/generate-document";
+import { codeBlock } from "common-tags";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -62,7 +63,8 @@ async function handleChat(req: Request) {
   }).chat(BASE_MODEL);
   const result = await streamText({
     model: model,
-    system: settings.systemMessage,
+    system: codeBlock`現在の日付は: ${new Date().toLocaleDateString()}です。
+     ${settings.systemMessage}`,
     maxRetries: 0,
     maxSteps: MAX_STEPS_FOR_TOOL_CALLS,
     toolChoice: "auto",
