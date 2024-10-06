@@ -16,13 +16,17 @@ import { useDeleteThreadMutation } from "@/services/threads/mutations";
 import { useUpdateUserPreferencesMutation } from "@/services/user/mutations";
 import { useUserPreferencesQuery } from "@/services/user/queries";
 import { useResetDatabase } from "@/hooks/use-reset-database";
+import { FullPageLoader } from "@/components/fulll-page-loader";
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const { openAlert } = useAlert();
   const { reset } = useResetDatabase();
-  const { data: userPreferences } = useUserPreferencesQuery();
+  const userPreferences = useUserPreferencesQuery();
   const { mutateAsync } = useUpdateUserPreferencesMutation();
   const { mutateAsync: deleteThread } = useDeleteThreadMutation();
+  if (userPreferences.isLoading || !userPreferences.data) {
+    return <FullPageLoader label={t("settings.loading")} />;
+  }
   const models = [
     {
       name: "GPT-4o-mini",
@@ -100,13 +104,13 @@ export default function SettingsPage() {
               </Label>
               <div className="flex items-center">
                 <Select
-                  defaultValue={userPreferences?.llmModel ?? "gpt-4o-mini"}
+                  defaultValue={userPreferences.data.llmModel ?? "gpt-4o-mini"}
                   onValueChange={(value) => mutateAsync({ llmModel: value })}
                 >
                   <SelectTrigger>
                     {
                       models.find(
-                        (model) => model.value === userPreferences?.llmModel
+                        (model) => model.value === userPreferences.data.llmModel
                       )?.name
                     }
                   </SelectTrigger>

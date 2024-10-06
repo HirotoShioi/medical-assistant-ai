@@ -15,7 +15,8 @@
     "deleteThreadsConfirmation": "本当に会話履歴を削除しますか？削除するとこれまでの会話履歴、及びそれに関連するドキュメントが失われます。",
     "llmModel": "AIモデル",
     "gpt4oMiniDescription": "日常のタスクに適した軽量なモデル",
-    "gpt4oDescription": "高度なタスクに適した高性能モデル"
+    "gpt4oDescription": "高度なタスクに適した高性能モデル",
+    "loading": "ユーザー設定を読み込み中..."
   },
   "notFound": {
     "title": "404",
