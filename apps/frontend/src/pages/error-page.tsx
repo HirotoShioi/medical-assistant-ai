@@ -7,10 +7,12 @@ import { useTranslation } from "react-i18next";
 import Header from "@/components/header";
 import { AlertTitle, AlertDescription, Alert } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { useResetDatabase } from "@/hooks/use-reset-database";
 
 export default function ErrorPage() {
   const error = useRouteError() as Error;
   const { t } = useTranslation();
+  const { reset } = useResetDatabase();
   if (error) {
     console.error(error);
   }
@@ -32,8 +34,8 @@ export default function ErrorPage() {
           <Button asChild>
             <Link to="/">{t("error.goHome")}</Link>
           </Button>
-          <Button asChild variant="outline">
-            <Link to="/settings">{t("error.goSettings")}</Link>
+          <Button variant="destructive" onClick={reset}>
+            {t("error.resetDatabase")}
           </Button>
         </div>
       </div>

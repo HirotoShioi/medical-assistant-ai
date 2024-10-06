@@ -46,8 +46,8 @@
     "oops": "Oops!",
     "unexpectedError": "An unexpected error has occurred.",
     "goHome": "Go to Home",
-    "databaseReset": "If the problem persists, go to the settings page and try resetting the database.",
-    "goSettings": "Go to Settings"
+    "databaseReset": "If the problem persists, try resetting the database.",
+    "resetDatabase": "Reset Database"
   },
   "usageTooltip": {
     "pleaseSignIn": "Please sign in to use this feature",
