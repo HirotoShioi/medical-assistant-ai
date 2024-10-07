@@ -8,7 +8,7 @@ function AgentPage() {
     const formData = new FormData(e.target as HTMLFormElement);
     const message = formData.get("message") as string;
     console.log(message);
-    invokeAgent();
+    invokeAgent(message);
   };
   return (
     <div>

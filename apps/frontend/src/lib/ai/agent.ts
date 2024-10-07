@@ -5,24 +5,36 @@ import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { codeBlock } from "common-tags";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
+import { SearchResult, searchWeb } from "./web-search";
+import { PromptTemplate } from "@langchain/core/prompts";
 
-const getWeather = tool(
-  (input) => {
-    console.log(input);
-    if (["sf", "san francisco"].includes(input.location.toLowerCase())) {
-      return "It's 60 degrees and foggy.";
-    } else {
-      return "It's 90 degrees and sunny.";
-    }
+const searchWebTool = tool(
+  async ({ queries }) => {
+    console.log(queries);
+    const result = await queries.reduce<Promise<SearchResult>>(
+      async (acc, query) => {
+        const res = await acc;
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const results = await searchWeb(query, {
+          limit: 5,
+        });
+        return [...res.flat(), ...results.flat()];
+      },
+      Promise.resolve([])
+    );
+    return {
+      results: result,
+    };
   },
   {
-    name: "get_weather",
-    description: "Call to get the current weather.",
+    name: "search_web",
+    description: "Call to search the web.",
     schema: z.object({
-      location: z.string().describe("Location to get the weather for."),
+      queries: z.array(z.string()).describe("Queries to search the web for."),
     }),
   }
 );
+
 const systemMessage = new SystemMessage(codeBlock`
 Begin by enclosing all thoughts within <thinking> tags, exploring multiple angles and approaches.
 Break down the solution into clear steps within <step> tags. Start with a 20-step budget, requesting more for complex problems if needed.
@@ -44,31 +56,49 @@ Conclude with a final reflection on the overall solution, discussing effectivene
 At the end, provide a final answer as JSON with the following structure in one line:
 { "answer": string; "reflection": string; "reward": number;}`);
 
-type AgentResult = {
-  answer: string;
-  reflection: string;
-  reward: number;
-};
-export async function invokeAgent(): Promise<AgentResult> {
-  const agentModel = await getModel({
+const schema = z.object({
+  answer: z.string(),
+  reflection: z.string(),
+  reward: z.number(),
+});
+
+type AgentResult = z.infer<typeof schema>;
+async function extractAgentResult(result: string): Promise<AgentResult> {
+  const model = await getModel({
     model: BASE_MODEL,
     temperature: 0,
   });
-  const tools = [getWeather];
+  const template = PromptTemplate.fromTemplate(`
+  Extract Agent Result from the following output.
+
+  <result>
+  {result}
+  </result>
+  `);
+  const modelWithSchema = template.pipe(model.withStructuredOutput(schema));
+  return modelWithSchema.invoke({ result });
+}
+
+async function invokeAgent(message: string): Promise<AgentResult> {
+  const agentModel = await getModel({
+    model: BASE_MODEL,
+    maxConcurrency: 1,
+    maxRetries: 0,
+    temperature: 0,
+  });
   const agent = createReactAgent({
     llm: agentModel,
-    tools: tools,
+    tools: [searchWebTool],
     messageModifier: (messages) => {
       return [systemMessage, ...messages];
     },
   });
   const agentNextState = await agent.invoke({
-    messages: [new HumanMessage("what is the current weather in sf")],
+    messages: [new HumanMessage(message)],
   });
   const result =
     agentNextState.messages[agentNextState.messages.length - 1].content;
-  // 最後の行を取り出す
-  const lastLine = result.split("\n").pop();
-  console.log(lastLine);
-  return JSON.parse(lastLine) as AgentResult;
+  return extractAgentResult(result);
 }
+
+export { invokeAgent };
