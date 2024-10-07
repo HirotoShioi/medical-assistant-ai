@@ -1,7 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { generatePatientReferralDocument } from "@/services/ai/document-generator/generate-patient-referral-document";
+import { generateDocument as generateDocumentFn } from "@/lib/ai/generate-document";
 import { nanoid } from "nanoid";
 import { Message } from "ai/react";
+import { getThreadSettingsById } from "@/services/threads/service";
+import { getResourcesByThreadId } from "@/services/resources/service";
+import { getMessagesByThreadId } from "@/services/messages/services";
 
 export function useDocumentGenerator(
   threadId: string,
@@ -11,7 +14,16 @@ export function useDocumentGenerator(
 
   const generateDocument = useMutation({
     mutationFn: async () => {
-      const result = await generatePatientReferralDocument(threadId);
+      const [threadSettings, messages, documents] = await Promise.all([
+        getThreadSettingsById(threadId),
+        getMessagesByThreadId(threadId),
+        getResourcesByThreadId(threadId),
+      ]);
+      const result = await generateDocumentFn({
+        documentGenerationPrompt: threadSettings.reportGenerationPrompt ?? "",
+        messages,
+        documents,
+      });
       const message: Message = {
         id: nanoid(),
         role: "assistant",

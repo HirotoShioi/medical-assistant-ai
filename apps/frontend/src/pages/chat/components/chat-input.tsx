@@ -36,7 +36,7 @@ function ChatInput() {
               <span className="sr-only">ファイルをアップロード</span>
             </Button>
           </Tooltip>
-          {/* <DocumentGenerationButton /> */}
+          <DocumentGenerationButton />
         </div>
         <div className="relative">
           <UsageTooltip usage={usage}>
@@ -64,7 +64,7 @@ function ChatInput() {
   );
 }
 
-export function DocumentGenerationButton() {
+function DocumentGenerationButton() {
   const { usage, generateDocument, isLoading, threadSettings } =
     useChatContext();
   const { openAlert } = useAlert();
