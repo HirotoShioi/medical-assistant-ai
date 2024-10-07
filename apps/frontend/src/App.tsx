@@ -8,7 +8,7 @@ import Root from "@/routes/root";
 import Providers from "@/providers/providers";
 import NotFoundPage from "./pages/not-found-page";
 import ChatPage from "./pages/chat/page";
-import SettingsPage from "./pages/settings-page";
+import SettingsPage from "./pages/settings/page";
 import IndexPage from "./pages/index/page";
 import Callback, { loader as callbackLoader } from "./pages/callback";
 import SignInPage from "./pages/sign-in";

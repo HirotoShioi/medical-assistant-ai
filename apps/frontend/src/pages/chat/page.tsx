@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import ChatMessage from "./chat-message";
-import ChatInput from "./chat-input";
-import { ResourcePanel } from "./resource-panel";
+import ChatMessage from "./components/chat-message";
+import ChatInput from "./components/chat-input";
+import { ResourcePanel } from "./components/resource-panel";
 import { ChatContextProvider, useChatContext } from "@/pages/chat/context";
 import React from "react";
-import { ChatTitle } from "./chat-title";
+import { ChatTitle } from "./components/chat-title";
 import { useUsageQuery } from "@/services/usage/queries";
 import { useMessagesQuery } from "@/services/messages/queries";
 import { useResourcesQuery } from "@/services/resources/queries";
@@ -17,7 +17,7 @@ import {
 } from "@/services/threads/queries";
 import { useDropzone } from "react-dropzone";
 import { Loader2 } from "lucide-react";
-import ResourceUploader from "./resource-uploader";
+import ResourceUploader from "./components/resource-uploader";
 
 const Resource = React.memo(ResourcePanel);
 

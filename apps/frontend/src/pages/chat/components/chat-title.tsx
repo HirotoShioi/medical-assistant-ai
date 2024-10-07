@@ -14,7 +14,7 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import { useNavigate, useRevalidator } from "react-router-dom";
 import { Thread } from "@/models";
 import Dropdown from "@/components/dropdown";
-import { useChatContext } from "./context";
+import { useChatContext } from "../context";
 import { useTranslation } from "react-i18next";
 import { useRenameThreadMutation } from "@/services/threads/mutations";
 

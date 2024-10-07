@@ -16,7 +16,7 @@ type DatabaseTemplate = typeof schema.templates.$inferSelect;
 type NewMessageParams = z.infer<typeof insertMessageSchema>;
 type ThreadSettings = typeof schema.threadSettings.$inferSelect;
 type NewThreadSettingsParams = z.infer<typeof insertThreadSettingsSchema>;
-
+type UserPreferences = typeof schema.userPreferences.$inferSelect;
 export type {
   NewMessageParams,
   NewResourceParams,
@@ -28,4 +28,5 @@ export type {
   Template,
   ThreadSettings,
   NewThreadSettingsParams,
+  UserPreferences,
 };

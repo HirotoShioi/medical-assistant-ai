@@ -1,5 +1,8 @@
 import Header from "@/components/header";
-import { TemplateForm, TemplateFormData } from "./template-form";
+import {
+  TemplateForm,
+  TemplateFormData,
+} from "@/pages/edit-template/components/template-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTemplateQueryById } from "@/services/templates/queries";
 import { FullPageLoader } from "@/components/fulll-page-loader";
@@ -26,16 +29,18 @@ export default function EditTemplatePage() {
     if (!template) {
       return;
     }
-    updateTemplate({
-      id: template.id,
-      ...params,
-    }, {
-      onSuccess: () => {
-        toast({
-          title: "テンプレート更新",
-          variant: "info",
-          description: "テンプレートを更新しました。",
-        });
+    updateTemplate(
+      {
+        id: template.id,
+        ...params,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "テンプレート更新",
+            variant: "info",
+            description: "テンプレートを更新しました。",
+          });
         },
         onError: (error) => {
           toast({
