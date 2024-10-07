@@ -77,7 +77,8 @@
     "searchingInformation": "Searching information",
     "embeddingResources": "Embedding resources",
     "processing": "Processing...",
-    "generatingDocument": "Generating document"
+    "generatingDocument": "Generating document",
+    "searchingWeb": "Searching web"
   },
   "resourceUploader": {
     "dropFiles": "Drop files here",

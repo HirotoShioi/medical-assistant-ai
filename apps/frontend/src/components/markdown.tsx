@@ -54,6 +54,41 @@ export function Markdown({ content }: { content: string }) {
           pre: ({ children }) => (
             <pre className="bg-slate-200 p-4 rounded-md">{children}</pre>
           ),
+          // @ts-expect-error react-markdown doesn't support custom components
+          thinking: ({ children }) => (
+            <div className="">
+              <h3 className="text-md font-bold">Thinking</h3>
+              <div className="space-y-2">{children}</div>
+            </div>
+          ),
+          // @ts-expect-error react-markdown doesn't support custom components
+          step: ({ children }) => (
+            <div className="">
+              <div className="space-y-2">{children}</div>
+            </div>
+          ),
+          count: () => <></>,
+          // @ts-expect-error react-markdown doesn't support custom components
+          reflection: ({ children }) => (
+            <div className="">
+              <h3 className="text-md font-bold">Reflection</h3>
+              <div className="space-y-2">{children}</div>
+            </div>
+          ),
+          // @ts-expect-error react-markdown doesn't support custom components
+          reward: ({ children }) => (
+            <div className="">
+              <h3 className="text-md font-bold">Reward</h3>
+              <div className="space-y-2">{children}</div>
+            </div>
+          ),
+          // @ts-expect-error react-markdown doesn't support custom components
+          answer: ({ children }) => (
+            <div className="">
+              <h3 className="text-md font-bold">Answer</h3>
+              <div className="space-y-2">{children}</div>
+            </div>
+          ),
         }}
       >
         {content}

@@ -10,10 +10,12 @@ const schema = z.array(
 );
 
 type SearchResult = z.infer<typeof schema>;
+
 type SearchWebOptions = {
   limit?: number;
 };
-async function searchWeb(
+
+async function search(
   query: string,
   options?: SearchWebOptions
 ): Promise<SearchResult> {
@@ -39,6 +41,23 @@ async function searchWeb(
     return result.data;
   }
   return [];
+}
+
+async function searchWeb(
+  queries: string[] | string,
+  options?: SearchWebOptions
+): Promise<SearchResult> {
+  const queriesArray = Array.isArray(queries) ? queries : [queries];
+  const result = await queriesArray.reduce<Promise<SearchResult>>(
+    async (acc, query) => {
+      const res = await acc;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const results = await search(query, options);
+      return [...res.flat(), ...results.flat()];
+    },
+    Promise.resolve([])
+  );
+  return result;
 }
 
 export { searchWeb };

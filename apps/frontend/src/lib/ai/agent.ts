@@ -4,23 +4,14 @@ import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { codeBlock } from "common-tags";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { SearchResult, searchWeb } from "./web-search";
+import { searchWeb } from "./web-search";
 import { PromptTemplate } from "@langchain/core/prompts";
 
 const searchWebTool = tool(
   async ({ queries }) => {
-    console.log(queries);
-    const result = await queries.reduce<Promise<SearchResult>>(
-      async (acc, query) => {
-        const res = await acc;
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const results = await searchWeb(query, {
-          limit: 5,
-        });
-        return [...res.flat(), ...results.flat()];
-      },
-      Promise.resolve([])
-    );
+    const result = await searchWeb(queries, {
+      limit: 5,
+    });
     return {
       results: result,
     };

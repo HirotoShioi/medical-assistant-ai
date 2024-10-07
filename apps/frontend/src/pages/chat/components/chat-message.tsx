@@ -20,6 +20,8 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
         return t("toolMessage.embeddingResources");
       case "generateDocument":
         return t("toolMessage.generatingDocument");
+      case "searchWeb":
+        return t("toolMessage.searchingWeb");
       default:
         return t("toolMessage.processing");
     }

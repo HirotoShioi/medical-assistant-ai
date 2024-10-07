@@ -12,6 +12,8 @@ import { getResourcesByThreadId } from "@/services/resources/service";
 import { generateDocument } from "@/lib/ai/generate-document";
 import { codeBlock } from "common-tags";
 import { getUserPreferences } from "@/services/user/service";
+import { searchWeb } from "@/lib/ai/web-search";
+import { Resource } from "@/models";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -56,9 +58,10 @@ async function handleChat(req: Request) {
   if (!session.tokens?.idToken) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const [settings, userPreferences] = await Promise.all([
+  const [settings, userPreferences, resources] = await Promise.all([
     getThreadSettingsById(threadId),
     getUserPreferences(),
+    getResourcesByThreadId(threadId),
   ]);
   const { messages } = body as { messages: any[] };
   const model = createOpenAI({
@@ -67,25 +70,34 @@ async function handleChat(req: Request) {
   }).chat(userPreferences.llmModel);
   const result = await streamText({
     model: model,
-    system: codeBlock`現在の日付は: ${new Date().toLocaleDateString()}です。
-     ${settings.systemMessage}`,
+    system: codeBlock`Today's date: ${new Date().toLocaleDateString()}
+    ${settings.systemMessage}`,
     maxRetries: 0,
     maxSteps: MAX_STEPS_FOR_TOOL_CALLS,
     toolChoice: "auto",
     messages: convertToCoreMessages(messages),
     tools: {
-      getRelavantInformation: getRelavantInformationTool(threadId),
+      getRelavantInformation: getRelavantInformationTool(threadId, resources),
       embedResource: embedResourceTool(),
       generateDocument: generateDocumentTool(threadId),
+      searchWeb: searchWebTool(),
     },
   });
   return result.toDataStreamResponse();
 }
 
-function getRelavantInformationTool(threadId: string) {
+function getRelavantInformationTool(threadId: string, resources: Resource[]) {
+  const availableResources = resources
+    .map((resource) => `${resource.title} - ${resource.summary}`)
+    .join("\n");
   return tool({
-    description:
-      "Get information from your knowledge base to answer user's questions. Rewrite it into 5 distinct queries that could be used to search for relevant information. Each query should focus on different aspects or potential interpretations of the original message. No questions, just a query maximizing the chance of finding relevant information.",
+    description: codeBlock`
+    Get information from your knowledge base to answer user's questions. 
+    - If no resources are available, return an empty array.
+    
+    Available resources:
+    ${resources.length > 0 ? availableResources : "No resources available"}
+    `,
     parameters: z.object({
       queries: z
         .string()
@@ -145,7 +157,20 @@ function generateDocumentTool(threadId: string) {
   });
 }
 
+function searchWebTool() {
+  return tool({
+    description: "Search the web for information.",
+    parameters: z.object({
+      queries: z.string().describe("The queries to search the web for."),
+    }),
+    execute: async ({ queries }) => {
+      return searchWeb(queries);
+    },
+  });
+}
+
 export type ToolNames =
   | "getRelavantInformation"
   | "embedResource"
-  | "generateDocument";
+  | "generateDocument"
+  | "searchWeb";
