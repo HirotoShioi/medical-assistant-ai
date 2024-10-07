@@ -12,7 +12,6 @@ import { getResourcesByThreadId } from "@/services/resources/service";
 import { generateDocument } from "@/lib/ai/generate-document";
 import { codeBlock } from "common-tags";
 import { getUserPreferences } from "@/services/user/service";
-import { searchWeb } from "@/lib/ai/web-search";
 import { Resource } from "@/models";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
@@ -80,7 +79,6 @@ async function handleChat(req: Request) {
       getRelavantInformation: getRelavantInformationTool(threadId, resources),
       embedResource: embedResourceTool(),
       generateDocument: generateDocumentTool(threadId),
-      searchWeb: searchWebTool(),
     },
   });
   return result.toDataStreamResponse();
@@ -157,17 +155,23 @@ function generateDocumentTool(threadId: string) {
   });
 }
 
-function searchWebTool() {
-  return tool({
-    description: "Search the web for information.",
-    parameters: z.object({
-      queries: z.string().describe("The queries to search the web for."),
-    }),
-    execute: async ({ queries }) => {
-      return searchWeb(queries);
-    },
-  });
-}
+// function searchWebTool() {
+//   return tool({
+//     description: codeBlock`
+// Search the web and gather relevant information:
+// - Group similar queries together and send them as a batch whenever possible.
+// - Ensure that the queries are concise and specific to get accurate results.
+// - Limit the number of individual queries to avoid unnecessary searches.
+// - Return a summary of the findings for each batch.
+//     `,
+//     parameters: z.object({
+//       queries: z.string().describe("The queries to search the web for."),
+//     }),
+//     execute: async ({ queries }) => {
+//       return searchWeb(queries);
+//     },
+//   });
+// }
 
 export type ToolNames =
   | "getRelavantInformation"
