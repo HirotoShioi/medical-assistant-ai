@@ -14,6 +14,7 @@ import Callback, { loader as callbackLoader } from "./pages/callback";
 import SignInPage from "./pages/sign-in";
 import { fetchAuthSession } from "aws-amplify/auth";
 import EditTemplatePage from "./pages/edit-template/page";
+import AgentPage from "./pages/agent/page";
 
 async function redirectIfAuthenticated() {
   const session = await fetchAuthSession();
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
             path: "/callback",
             element: <Callback />,
             loader: callbackLoader,
+          },
+          {
+            path: "/agent",
+            element: <AgentPage />,
           },
           {
             path: "/not-found",
