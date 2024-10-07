@@ -6,7 +6,6 @@ import { getDB } from "@/lib/database/client";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { desc, eq, inArray } from "drizzle-orm";
 import { getModel } from "@/lib/ai/model";
-import { BASE_MODEL } from "@/constants";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { HumanMessage } from "@langchain/core/messages";
 import { codeBlock } from "common-tags";
@@ -16,10 +15,7 @@ async function situateContext(
   document: string,
   chunk: string
 ): Promise<string> {
-  const model = await getModel({
-    model: BASE_MODEL,
-    temperature: 0,
-  });
+  const model = await getModel();
   // We're trying to hit the cache by providing same context on the prefix
   const message = new HumanMessage({
     content: [
@@ -62,10 +58,7 @@ async function generateChunks(input: string): Promise<string[]> {
 }
 
 async function generateSummary(input: string): Promise<string> {
-  const model = await getModel({
-    model: BASE_MODEL,
-    temperature: 0,
-  });
+  const model = await getModel();
   const message = new HumanMessage({
     content: [
       {
@@ -93,11 +86,10 @@ export const embedResource = async (
   const db = await getDB();
   try {
     const summary = await generateSummary(input.content);
-    const { content, threadId, title, fileType } =
-      insertResourceSchema.parse({
-        ...input,
-        summary: summary,
-      });
+    const { content, threadId, title, fileType } = insertResourceSchema.parse({
+      ...input,
+      summary: summary,
+    });
     const [resource] = await db
       .insert(schema.resources)
       .values({

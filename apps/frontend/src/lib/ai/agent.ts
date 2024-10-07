@@ -1,6 +1,5 @@
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { getModel } from "./model";
-import { BASE_MODEL } from "@/constants";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { codeBlock } from "common-tags";
 import { tool } from "@langchain/core/tools";
@@ -64,10 +63,7 @@ const schema = z.object({
 
 type AgentResult = z.infer<typeof schema>;
 async function extractAgentResult(result: string): Promise<AgentResult> {
-  const model = await getModel({
-    model: BASE_MODEL,
-    temperature: 0,
-  });
+  const model = await getModel();
   const template = PromptTemplate.fromTemplate(`
   Extract Agent Result from the following output.
 
@@ -81,10 +77,10 @@ async function extractAgentResult(result: string): Promise<AgentResult> {
 
 async function invokeAgent(message: string): Promise<AgentResult> {
   const agentModel = await getModel({
-    model: BASE_MODEL,
     maxConcurrency: 1,
-    maxRetries: 0,
-    temperature: 0,
+    onFailedAttempt: (error) => {
+      console.log(error);
+    },
   });
   const agent = createReactAgent({
     llm: agentModel,

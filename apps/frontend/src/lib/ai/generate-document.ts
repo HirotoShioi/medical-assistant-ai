@@ -1,4 +1,3 @@
-import { BASE_MODEL } from "@/constants";
 import { getModel } from "./model";
 import { Message } from "ai/react";
 import { Resource } from "@/models";
@@ -23,10 +22,7 @@ export async function generateDocument({
     cleanseData(messages, documents),
     extractRequests(messages),
   ]);
-  const model = await getModel({
-    model: BASE_MODEL,
-    temperature: 0,
-  });
+  const model = await getModel();
   const instructions =
     documentGenerationPrompt ??
     codeBlock`
@@ -67,10 +63,7 @@ export async function generateDocument({
 
 // 会話履歴から、ユーザーのリクエストを抽出する
 async function extractRequests(messages: Message[]) {
-  const model = await getModel({
-    model: BASE_MODEL,
-    temperature: 0,
-  });
+  const model = await getModel();
   const schema = z.object({
     requests: z.array(z.string()).nullable(),
   });
@@ -97,10 +90,7 @@ async function extractRequests(messages: Message[]) {
 
 // 会話履歴から、不要な情報を削除する
 async function cleanseData(messages: Message[], documents: Resource[]) {
-  const model = await getModel({
-    model: BASE_MODEL,
-    temperature: 0,
-  });
+  const model = await getModel();
   const template = PromptTemplate.fromTemplate(codeBlock`
   You are an assistant tasked with cleaning the following medical data for report generation. Your job is to process the data carefully, following these instructions:
 

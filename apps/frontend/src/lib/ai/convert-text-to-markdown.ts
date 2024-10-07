@@ -25,10 +25,7 @@ export async function convertTextToMarkdown(
       title: "Document.md",
     };
   }
-  const model = await getModel({
-    model: "gpt-4o-mini",
-    temperature: 0,
-  });
+  const model = await getModel();
 
   const withStructuredOutput = model.withStructuredOutput(schema);
 
