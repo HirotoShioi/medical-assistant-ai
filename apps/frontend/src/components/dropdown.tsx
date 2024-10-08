@@ -45,6 +45,7 @@ export default function Dropdown() {
             {t("dropdown.signIn")}
           </HeaderMenuItem>
         )}
+        <HeaderMenuItem href="/policy">{t("dropdown.policy")}</HeaderMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

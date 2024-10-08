@@ -15,6 +15,7 @@ import SignInPage from "./pages/sign-in";
 import { fetchAuthSession } from "aws-amplify/auth";
 import EditTemplatePage from "./pages/edit-template/page";
 import AgentPage from "./pages/agent/page";
+import PolicyPage from "./pages/policy/page";
 
 async function redirectIfAuthenticated() {
   const session = await fetchAuthSession();
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
           {
             path: "/not-found",
             element: <NotFoundPage />,
+          },
+          {
+            path: "/policy",
+            element: <PolicyPage />,
           },
           { path: "*", element: <NotFoundPage /> },
         ],

@@ -41,7 +41,8 @@
   "dropdown": {
     "signOut": "Sign out",
     "signIn": "Sign in",
-    "settings": "Settings"
+    "settings": "Settings",
+    "policy": "Policy"
   },
   "error": {
     "oops": "Oops!",
@@ -138,5 +139,9 @@
     "reportGenerationPromptLabel": "Report Generation Prompt",
     "reportGenerationPromptDescription": "Enter the prompt for the AI to generate a report.",
     "reportGenerationPromptPlaceholder": "Enter the prompt for the AI to generate a report."
+  },
+  "policy": {
+    "title": "Policy",
+    "privacyPolicy": "Privacy Policy"
   }
 }
