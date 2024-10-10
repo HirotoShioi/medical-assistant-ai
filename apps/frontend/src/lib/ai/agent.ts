@@ -4,7 +4,7 @@ import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { codeBlock } from "common-tags";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { searchWeb } from "./web-search";
+import { searchWeb } from "../api";
 import { PromptTemplate } from "@langchain/core/prompts";
 
 const searchWebTool = tool(

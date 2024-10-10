@@ -9,6 +9,7 @@ import { ChatConfig, EmbeddingsConfig, SearchConfig, SupportedModels } from './c
 import { corsMiddleware } from './middleware/cors';
 import { bodyLimit } from 'hono/body-limit';
 import { search } from './lib/duck-duck-go';
+import { getMedicineInfo } from './lib/medicine-info';
 const app = createHono();
 
 app.use('/*', logger());
@@ -89,10 +90,6 @@ app.post('/v1/models', async (c) => {
 });
 
 app.get('/v1/search', async (c) => {
-	const jwtPayload = c.get('jwtPayload');
-	if (!jwtPayload.sub) {
-		throw new Error('Invalid token');
-	}
 	const input = c.req.query('query') as string;
 	const limit = c.req.query('limit') as string;
 	if (!input) {
@@ -108,6 +105,12 @@ app.get('/v1/search', async (c) => {
 			}))
 			.slice(0, Math.min(SearchConfig.maxResults, limit ? parseInt(limit) : 3))
 	);
+});
+
+app.get('/v1/medicines', async (c) => {
+	const input = c.req.query('query') as string;
+	const medicineInfos = getMedicineInfo(input);
+	return c.json(medicineInfos);
 });
 
 export default app;

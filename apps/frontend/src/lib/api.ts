@@ -60,5 +60,38 @@ async function searchWeb(
   return result;
 }
 
-export { searchWeb };
-export type { SearchResult };
+type Medicine = {
+  medicineName: string;
+  genericName: string;
+  url: string;
+};
+
+async function searchMedicine(query: string): Promise<Medicine[]> {
+  const url = new URL(`${import.meta.env.VITE_API_URL}/medicines`);
+  const session = await fetchAuthSession();
+  if (!session.tokens?.idToken) {
+    throw new Error("No session");
+  }
+  url.searchParams.set("query", query);
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${session.tokens.idToken.toString()}`,
+    },
+  });
+  if (response.status !== 200) {
+    return [];
+  }
+  const json = (await response.json()) as {
+    medicine_name: string;
+    generic_name: string;
+    url: string;
+  }[];
+  return json.map((medicine) => ({
+    medicineName: medicine.medicine_name,
+    genericName: medicine.generic_name,
+    url: medicine.url,
+  }));
+}
+
+export { searchWeb, searchMedicine };
+export type { SearchResult, Medicine };

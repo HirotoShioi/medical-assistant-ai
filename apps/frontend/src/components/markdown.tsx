@@ -9,8 +9,31 @@ import {
   TableHead,
   TableCell,
 } from "./ui/table";
+import { useAlert } from "./alert";
+import { useTranslation } from "react-i18next";
 
 export function Markdown({ content }: { content: string }) {
+  const { openAlert } = useAlert();
+  const { t } = useTranslation();
+  const handleClick = (href: string) => {
+    console.log("handleClick", href);
+    openAlert({
+      title: t("markdown.openInNewTab"),
+      description: t("markdown.openInNewTabDescription"),
+      actions: [
+        {
+          label: t("markdown.cancel"),
+          variant: "cancel",
+        },
+        {
+          label: t("markdown.openInNewTab"),
+          onClick: () => {
+            window.open(href, "_blank");
+          },
+        },
+      ],
+    });
+  };
   return (
     <div className="space-y-4">
       <ReactMarkdown
@@ -27,6 +50,15 @@ export function Markdown({ content }: { content: string }) {
           tr: ({ children }) => <TableRow>{children}</TableRow>,
           th: ({ children }) => <TableHead>{children}</TableHead>,
           td: ({ children }) => <TableCell>{children}</TableCell>,
+          a: ({ children, href }) => (
+            <a
+              className="text-blue-500 underline cursor-pointer"
+              onClick={() => handleClick(href ?? "")}
+            >
+              {children}
+            </a>
+          ),
+          p: ({ children }) => <div>{children}</div>,
           ul: ({ children }) => (
             <ul className="list-disc space-y-3 pl-4">{children}</ul>
           ),

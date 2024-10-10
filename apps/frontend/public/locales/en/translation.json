@@ -143,5 +143,10 @@
   "policy": {
     "title": "Policy",
     "privacyPolicy": "Privacy Policy"
+  },
+  "markdown": {
+    "openInNewTab": "Open in new tab",
+    "openInNewTabDescription": "External website will be opened. Continue?",
+    "cancel": "Cancel"
   }
 }

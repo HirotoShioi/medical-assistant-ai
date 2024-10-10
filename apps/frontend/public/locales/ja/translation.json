@@ -146,5 +146,10 @@
   "policy": {
     "title": "利用規約",
     "privacyPolicy": "プライバシーポリシー"
+  },
+  "markdown": {
+    "openInNewTab": "新規タブで開く",
+    "openInNewTabDescription": "外部のウェブサイトへ移動しようとしています。続行しますか？",
+    "cancel": "キャンセル"
   }
 }

@@ -14,7 +14,7 @@ type AlertProps = {
   isOpen: boolean;
   onOpenChange: (v: boolean) => void;
   title: string;
-  description: string;
+  description: React.ReactNode;
   actions: {
     label: string;
     onClick?: () => void;

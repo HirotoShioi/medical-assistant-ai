@@ -13,6 +13,7 @@ import { generateDocument } from "@/lib/ai/generate-document";
 import { codeBlock } from "common-tags";
 import { getUserPreferences } from "@/services/user/service";
 import { Resource } from "@/models";
+import { searchMedicine } from "@/lib/api";
 
 export function useChat(threadId: string, initialMessages?: Message[]) {
   const chat = c({
@@ -79,6 +80,7 @@ async function handleChat(req: Request) {
       getRelavantInformation: getRelavantInformationTool(threadId, resources),
       embedResource: embedResourceTool(),
       generateDocument: generateDocumentTool(threadId),
+      searchMedicine: searchMedicineTool(),
     },
   });
   return result.toDataStreamResponse();
@@ -173,8 +175,23 @@ function generateDocumentTool(threadId: string) {
 //   });
 // }
 
+function searchMedicineTool() {
+  return tool({
+    description: codeBlock`
+    This tool enables you to search for medicine information. It'll return a list of medicines that match the query.
+    `,
+    parameters: z.object({
+      query: z.string().describe("The query to search for."),
+    }),
+    execute: async ({ query }) => {
+      return searchMedicine(query);
+    },
+  });
+}
+
 export type ToolNames =
   | "getRelavantInformation"
   | "embedResource"
   | "generateDocument"
-  | "searchWeb";
+  | "searchWeb"
+  | "searchMedicine";
