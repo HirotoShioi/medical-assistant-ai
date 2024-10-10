@@ -9,7 +9,7 @@ import { ChatConfig, EmbeddingsConfig, SearchConfig, SupportedModels } from './c
 import { corsMiddleware } from './middleware/cors';
 import { bodyLimit } from 'hono/body-limit';
 import { search } from './lib/duck-duck-go';
-import { getMedicineInfo } from './lib/medicine-info';
+import { getMedicineInfo } from './lib/medicines';
 const app = createHono();
 
 app.use('/*', logger());
