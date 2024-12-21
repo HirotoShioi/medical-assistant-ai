@@ -181,10 +181,17 @@ function searchMedicineTool() {
     This tool enables you to search for medicine information. It'll return a list of medicines that match the query.
     `,
     parameters: z.object({
-      query: z.string().describe("The query to search for."),
+      medicineNames: z
+        .array(
+          z.string().describe("The names of the medicines to search for.")
+        )
+        .describe("The names of the medicines to search for."),
     }),
-    execute: async ({ query }) => {
-      return searchMedicine(query);
+    execute: async ({ medicineNames }) => {
+      const medicines = await Promise.all(
+        medicineNames.map((name) => searchMedicine(name))
+      );
+      return medicines.flat();
     },
   });
 }

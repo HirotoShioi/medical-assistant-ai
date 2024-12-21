@@ -61,6 +61,7 @@ async function searchWeb(
 }
 
 type Medicine = {
+  query: string;
   medicineName: string;
   genericName: string;
   url: string;
@@ -87,6 +88,7 @@ async function searchMedicine(query: string): Promise<Medicine[]> {
     url: string;
   }[];
   return json.map((medicine) => ({
+    query,
     medicineName: medicine.medicine_name,
     genericName: medicine.generic_name,
     url: medicine.url,

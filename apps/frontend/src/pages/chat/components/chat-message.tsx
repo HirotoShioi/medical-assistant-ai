@@ -22,6 +22,8 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
         return t("toolMessage.generatingDocument");
       case "searchWeb":
         return t("toolMessage.searchingWeb");
+      case "searchMedicine":
+        return t("toolMessage.searchingMedicine");
       default:
         return t("toolMessage.processing");
     }
