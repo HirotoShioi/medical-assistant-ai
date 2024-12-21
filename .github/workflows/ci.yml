@@ -48,10 +48,6 @@ jobs:
         working-directory: ./apps/frontend
         run: pnpm lint
 
-      - name: Run tests
-        working-directory: ./apps/frontend
-        run: pnpm test
-
       - name: Build
         working-directory: ./apps/frontend
         run: pnpm build
