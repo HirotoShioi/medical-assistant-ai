@@ -23,7 +23,7 @@ export type TemplateFormData = {
   description: string;
   systemMessage: string;
   initialAssistantMessage: string;
-  reportGenerationPrompt?: string;
+  reportGenerationPrompt: string | null;
 };
 
 export type TemplateFormProps = {
@@ -48,19 +48,16 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
     initialAssistantMessage: z.string().min(1).max(1600, {
       message: "初期メッセージは1600文字以内で入力してください。",
     }),
-    reportGenerationPrompt: z
-      .string()
-      .max(600, {
-        message:
-          "書類作成時に気をつけるべき点は600文字以内で入力してください。",
-      })
-      .nullable(),
+    reportGenerationPrompt: z.string().max(600, {
+      message: "書類作成時に気をつけるべき点は600文字以内で入力してください。",
+    }),
   });
-  const form = useForm<TemplateFormData>({
-    resolver: zodResolver(schema as any),
+  type TemplateFormSchema = z.infer<typeof schema>;
+  const form = useForm<TemplateFormSchema>({
+    resolver: zodResolver(schema),
     defaultValues: {
       title: template?.title ?? "",
-      overview: template?.overview ?? "", 
+      overview: template?.overview ?? "",
       description: template?.description ?? "",
       systemMessage: template?.systemMessage ?? "",
       initialAssistantMessage: template?.initialAssistantMessage ?? "",
