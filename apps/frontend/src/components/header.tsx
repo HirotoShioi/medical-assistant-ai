@@ -1,6 +1,6 @@
 "use client";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import Dropdown from "./dropdown";
 import { Logo } from "./logo";
 

@@ -7,7 +7,7 @@ import {
   redirect,
   useNavigate,
   useSearchParams,
-} from "react-router-dom";
+} from "react-router";
 
 export function loader(arg: LoaderFunctionArgs) {
   const params = arg.params;

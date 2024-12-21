@@ -2,7 +2,7 @@ import {
   createBrowserRouter,
   redirect,
   RouterProvider,
-} from "react-router-dom";
+} from "react-router";
 import ErrorPage from "@/pages/error-page";
 import Root from "@/routes/root";
 import Providers from "@/providers/providers";

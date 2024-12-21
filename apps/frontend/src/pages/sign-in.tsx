@@ -1,6 +1,6 @@
 import { Authenticator, useAuthenticator } from "@aws-amplify/ui-react";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import "@aws-amplify/ui-react/styles.css";
 import Header from "@/components/header";
 import { useTranslation } from "react-i18next";

@@ -3,7 +3,7 @@ import {
   TemplateForm,
   TemplateFormData,
 } from "@/pages/edit-template/components/template-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { useTemplateQueryById } from "@/services/templates/queries";
 import { FullPageLoader } from "@/components/fulll-page-loader";
 import NotFoundPage from "../not-found-page";

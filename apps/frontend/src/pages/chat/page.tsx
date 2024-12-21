@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import ChatMessage from "./components/chat-message";
 import ChatInput from "./components/chat-input";

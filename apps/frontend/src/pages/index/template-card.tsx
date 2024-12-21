@@ -24,7 +24,7 @@ import { ChevronRight, MoreVertical, Edit, RotateCcw } from "lucide-react";
 import { iconMap, Template } from "@/models/template";
 import { useState } from "react";
 import { useCreateThreadMutation } from "@/services/threads/mutations";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { newThreadId } from "@/services/threads/service";
 import { formatDate } from "date-fns";
 import { useTranslation } from "react-i18next";
