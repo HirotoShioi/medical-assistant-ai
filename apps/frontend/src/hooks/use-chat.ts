@@ -68,7 +68,7 @@ async function handleChat(req: Request) {
     apiKey: session.tokens.idToken.toString(),
     baseURL: import.meta.env.VITE_API_URL,
   }).chat(userPreferences.llmModel);
-  const result = await streamText({
+  const result = streamText({
     model: model,
     system: codeBlock`Today's date: ${new Date().toLocaleDateString()}
     ${settings.systemMessage}`,
