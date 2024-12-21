@@ -72,7 +72,7 @@ const messages = pgTable("messages", {
     .primaryKey()
     .$defaultFn(() => nanoid()),
   role: text("role", {
-    enum: ["user", "assistant", "tool", "function", "system", "data"],
+    enum: ["user", "assistant", "system", "data"],
   }).notNull(),
   content: text("content").notNull(),
   threadId: varchar("thread_id", { length: MAX_VARCHAR_LENGTH })

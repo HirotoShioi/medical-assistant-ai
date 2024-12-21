@@ -22,6 +22,8 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
         return t("toolMessage.generatingDocument");
       case "searchWeb":
         return t("toolMessage.searchingWeb");
+      case "searchMedicine":
+        return t("toolMessage.searchingMedicine");
       default:
         return t("toolMessage.processing");
     }
@@ -43,8 +45,8 @@ function ChatMessage({ message }: ChatMessageProps) {
     return (
       <div className="text-base w-full">
         <div className="flex justify-end w-full">
-          <div className="max-w-[70%] rounded-3xl px-5 py-2.5 bg-primary text-primary-foreground">
-            {message.content}
+          <div className="max-w-[70%] rounded-3xl px-5 py-2.5 bg-muted">
+            <Markdown content={message.content} />
           </div>
         </div>
       </div>

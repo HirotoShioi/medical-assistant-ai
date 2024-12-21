@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { useNavigate, useRevalidator } from "react-router-dom";
+import { useNavigate, useRevalidator } from "react-router";
 import { Thread } from "@/models";
 import Dropdown from "@/components/dropdown";
 import { useChatContext } from "../context";

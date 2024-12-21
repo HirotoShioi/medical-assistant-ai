@@ -68,7 +68,7 @@ async function handleChat(req: Request) {
     apiKey: session.tokens.idToken.toString(),
     baseURL: import.meta.env.VITE_API_URL,
   }).chat(userPreferences.llmModel);
-  const result = await streamText({
+  const result = streamText({
     model: model,
     system: codeBlock`Today's date: ${new Date().toLocaleDateString()}
     ${settings.systemMessage}`,
@@ -181,10 +181,17 @@ function searchMedicineTool() {
     This tool enables you to search for medicine information. It'll return a list of medicines that match the query.
     `,
     parameters: z.object({
-      query: z.string().describe("The query to search for."),
+      medicineNames: z
+        .array(
+          z.string().describe("The name of the medicine to search for.")
+        )
+        .describe("List of medicine names to search for."),
     }),
-    execute: async ({ query }) => {
-      return searchMedicine(query);
+    execute: async ({ medicineNames }) => {
+      const medicines = await Promise.all(
+        medicineNames.map((name) => searchMedicine(name))
+      );
+      return medicines.flat();
     },
   });
 }

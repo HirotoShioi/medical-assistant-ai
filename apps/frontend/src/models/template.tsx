@@ -61,7 +61,7 @@ const templateSchema = z.object({
 
 function toTemplate(data: DatabaseTemplate): Template {
   const parsed = templateSchema.safeParse(
-    JSON.parse(data.originalTemplate as string)
+    data.originalTemplate
   );
   switch (data.type) {
     case "report":

@@ -79,7 +79,8 @@
     "embeddingResources": "Embedding resources",
     "processing": "Processing...",
     "generatingDocument": "Generating document",
-    "searchingWeb": "Searching web"
+    "searchingWeb": "Searching web",
+    "searchingMedicine": "Searching medicine information"
   },
   "resourceUploader": {
     "dropFiles": "Drop files here",

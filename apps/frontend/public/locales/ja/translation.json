@@ -89,7 +89,8 @@
     "embeddingResources": "リソースを追加中...",
     "processing": "処理中...",
     "generatingDocument": "ドキュメントを生成中",
-    "searchingWeb": "Webを検索中"
+    "searchingWeb": "Webを検索中",
+    "searchingMedicine": "薬品情報を検索中"
   },
   "callback": {
     "redirecting": "リダイレクト中..."

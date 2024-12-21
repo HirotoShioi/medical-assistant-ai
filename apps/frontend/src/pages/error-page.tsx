@@ -1,7 +1,7 @@
 import { pageWrapperStyles } from "@/styles/common";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { useRouteError } from "react-router-dom";
+import { Link } from "react-router";
+import { useRouteError } from "react-router";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/header";

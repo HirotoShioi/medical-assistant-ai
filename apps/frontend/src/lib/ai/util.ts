@@ -27,12 +27,6 @@ function toLangChainMessage(message: Message): BaseMessage[] {
       }
       return message.toolInvocations.map(toToolMessage);
     }
-    case "tool": {
-      if (!message.toolInvocations) {
-        return [];
-      }
-      return message.toolInvocations.map(toToolMessage);
-    }
     case "data": {
       return [new HumanMessage(message.content)];
     }
