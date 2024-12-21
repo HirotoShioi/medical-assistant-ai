@@ -57,10 +57,10 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
       .nullable(),
   });
   const form = useForm<TemplateFormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema as any),
     defaultValues: {
       title: template?.title ?? "",
-      overview: template?.overview ?? "",
+      overview: template?.overview ?? "", 
       description: template?.description ?? "",
       systemMessage: template?.systemMessage ?? "",
       initialAssistantMessage: template?.initialAssistantMessage ?? "",
