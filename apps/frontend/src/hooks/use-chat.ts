@@ -183,9 +183,9 @@ function searchMedicineTool() {
     parameters: z.object({
       medicineNames: z
         .array(
-          z.string().describe("The names of the medicines to search for.")
+          z.string().describe("The name of the medicine to search for.")
         )
-        .describe("The names of the medicines to search for."),
+        .describe("List of medicine names to search for."),
     }),
     execute: async ({ medicineNames }) => {
       const medicines = await Promise.all(
