@@ -46,7 +46,7 @@ function ChatMessage({ message }: ChatMessageProps) {
       <div className="text-base w-full">
         <div className="flex justify-end w-full">
           <div className="max-w-[70%] rounded-3xl px-5 py-2.5 bg-muted">
-            {message.content}
+            <Markdown content={message.content} />
           </div>
         </div>
       </div>

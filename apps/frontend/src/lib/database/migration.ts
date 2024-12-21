@@ -145,7 +145,7 @@ export async function applyMigrations(pglite: PGliteWorker) {
     );
     await db.insert(schema.userPreferences).values({
       id: nanoid(),
-      llmModel: "gpt-4o-mini",
+      llmModel: "gpt-4o",
     });
   }
 }
