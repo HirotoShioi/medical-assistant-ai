@@ -7,7 +7,7 @@ export async function saveMessage(input: NewMessageParams) {
   return db
     .insert(schema.messages)
     .values({
-      role: input.role as "user" | "assistant" | "tool",
+      role: input.role as "user" | "assistant" | "system" | "data",
       content: input.content,
       toolInvocations: input.toolInvocations,
       threadId: input.threadId,

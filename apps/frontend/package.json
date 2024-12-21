@@ -14,8 +14,8 @@
     "deploy": "pnpm run build && wrangler pages deploy ./dist"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.62",
-    "@ai-sdk/react": "^0.0.60",
+    "@ai-sdk/openai": "^1.0.0",
+    "@ai-sdk/react": "^1.0.0",
     "@aws-amplify/ui-react": "^6.7.2",
     "@cloudflare/workers-types": "^4.20241218.0",
     "@electric-sql/pglite": "^0.2.15",
@@ -40,7 +40,7 @@
     "@tanstack/react-query": "^5.62.8",
     "@tanstack/react-query-devtools": "^5.62.8",
     "@types/react-router-dom": "^5.3.3",
-    "ai": "^3.4.33",
+    "ai": "^4.0.0",
     "aws-amplify": "^6.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
