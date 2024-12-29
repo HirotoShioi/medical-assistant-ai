@@ -295,6 +295,9 @@ importers:
       eslint-plugin-storybook:
         specifier: ^0.11.1
         version: 0.11.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2)
+      globals:
+        specifier: ^15.14.0
+        version: 15.14.0
       postcss:
         specifier: ^8.4.49
         version: 8.4.49
@@ -4386,6 +4389,10 @@ packages:
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
+    engines: {node: '>=18'}
+
+  globals@15.14.0:
+    resolution: {integrity: sha512-OkToC372DtlQeje9/zHIo5CT8lRP/FUgEOKBEhU4e0abL7J7CD24fD9ohiLN5hagG/kWCYj4K5oaxxtj2Z0Dig==}
     engines: {node: '>=18'}
 
   gopd@1.2.0:
@@ -10495,6 +10502,8 @@ snapshots:
   globals@11.12.0: {}
 
   globals@14.0.0: {}
+
+  globals@15.14.0: {}
 
   gopd@1.2.0: {}
 
