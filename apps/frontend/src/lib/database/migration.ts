@@ -107,6 +107,7 @@ async function createHash(str: string) {
 }
 
 export async function applyMigrations(pglite: PGliteWorker) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = drizzle(pglite as any);
   await db.execute(createDrizzleMigrationsTable);
   const [migrationCount] = await db

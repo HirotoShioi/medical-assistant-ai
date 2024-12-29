@@ -7,6 +7,7 @@ import { memo } from "react";
 type ToolInvocation = {
   toolCallId: string;
   toolName: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: Record<string, any>;
 };
 

@@ -63,6 +63,7 @@ async function handleChat(req: Request) {
     getUserPreferences(),
     getResourcesByThreadId(threadId),
   ]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { messages } = body as { messages: any[] };
   const model = createOpenAI({
     apiKey: session.tokens.idToken.toString(),
