@@ -20,6 +20,7 @@ export async function getDB() {
         }
       );
       await pgClient.waitReady;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = drizzle(pgClient as any, { schema });
       await applyMigrations(pgClient);
       const endTime = performance.now();
