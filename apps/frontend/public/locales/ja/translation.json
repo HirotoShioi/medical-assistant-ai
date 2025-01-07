@@ -1,4 +1,10 @@
 {
+  "auth": {
+    "signedOut": "サインアウトしました",
+    "signedOutDescription": "サインアウトしました",
+    "signedIn": "サインインしました",
+    "signedInDescription": "サインインしました"
+  },
   "settings": {
     "title": "設定",
     "deleteDatabase": "データベースを削除",

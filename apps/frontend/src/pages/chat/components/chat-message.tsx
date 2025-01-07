@@ -59,11 +59,13 @@ function ChatMessage({ message }: ChatMessageProps) {
       <div className="md:max-w-3xl xl:max-w-[48rem]">
         <div className="flex text-center w-full">
           <div className="w-full p-4">
-            {message.toolInvocations.map((toolInvocation, index) => {
-              return (
-                <ToolMessage key={index} toolInvocation={toolInvocation} />
-              );
-            })}
+            {message.toolInvocations
+              .slice(0, 1)
+              .map((toolInvocation, index) => {
+                return (
+                  <ToolMessage key={index} toolInvocation={toolInvocation} />
+                );
+              })}
           </div>
         </div>
       </div>
