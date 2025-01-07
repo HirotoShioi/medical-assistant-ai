@@ -1,4 +1,10 @@
 {
+  "auth": {
+    "signedOut": "Signed out",
+    "signedOutDescription": "You have been signed out",
+    "signedIn": "Signed in",
+    "signedInDescription": "You have been signed in"
+  },
   "settings": {
     "title": "Settings",
     "deleteDatabase": "Delete Database",
