@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  redirect,
-  RouterProvider,
-} from "react-router";
+import { createBrowserRouter, redirect, RouterProvider } from "react-router";
 import ErrorPage from "@/pages/error-page";
 import Root from "@/routes/root";
 import Providers from "@/providers/providers";
@@ -16,6 +12,9 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import EditTemplatePage from "./pages/edit-template/page";
 import AgentPage from "./pages/agent/page";
 import PolicyPage from "./pages/policy/page";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { AlertProvider } from "./components/alert";
+import { Toaster } from "./components/ui/toaster";
 
 async function redirectIfAuthenticated() {
   const session = await fetchAuthSession();
@@ -83,7 +82,12 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Providers>
-      <RouterProvider router={router} />
+      <TooltipProvider delayDuration={0}>
+        <AlertProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </AlertProvider>
+      </TooltipProvider>
     </Providers>
   );
 }
