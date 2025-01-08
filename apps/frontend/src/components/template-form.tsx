@@ -50,7 +50,7 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
     }),
     reportGenerationPrompt: z.string().max(600, {
       message: "書類作成時に気をつけるべき点は600文字以内で入力してください。",
-    }),
+    }).optional(),
   });
   type TemplateFormSchema = z.infer<typeof schema>;
   const form = useForm<TemplateFormSchema>({
