@@ -33,7 +33,7 @@ export default function IndexPage() {
             <TemplateCard key={template.id} template={template} index={index} />
           ))}
           <button
-            onClick={() => navigate("/edit-template/new")}
+            onClick={() => navigate("/template/new")}
             className="group flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50 transition-all duration-200"
           >
             <div className="rounded-full bg-gray-100 p-3 group-hover:bg-gray-200 transition-colors">

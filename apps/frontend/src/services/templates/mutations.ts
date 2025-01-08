@@ -1,6 +1,7 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { resetTemplate, UpdateTemplateParams } from "./service";
+import { resetTemplate, UpdateTemplateParams, createTemplate } from "./service";
 import { updateTemplate } from "./service";
+import { NewTemplateParams } from "@/models/template";
 
 export const useUpdateTemplateMutation = () => {
   const client = useQueryClient();
@@ -24,6 +25,16 @@ export const useResetTemplateMutation = () => {
       client.invalidateQueries({
         queryKey: ["template", { id: t.id }],
       });
+    },
+  });
+};
+
+export const useCreateTemplateMutation = () => {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (params: NewTemplateParams) => createTemplate(params),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["templates"] });
     },
   });
 };

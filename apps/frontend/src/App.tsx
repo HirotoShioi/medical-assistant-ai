@@ -15,6 +15,7 @@ import PolicyPage from "./pages/policy/page";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { AlertProvider } from "./components/alert";
 import { Toaster } from "./components/ui/toaster";
+import NewTemplatePage from "./pages/new-template/page";
 
 async function redirectIfAuthenticated() {
   const session = await fetchAuthSession();
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
           {
             path: "/edit-template/:templateId",
             element: <EditTemplatePage />,
+          },
+          {
+            path: "/template/new",
+            element: <NewTemplatePage />,
           },
           {
             path: "/settings",

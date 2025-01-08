@@ -2,13 +2,14 @@ import Header from "@/components/header";
 import {
   TemplateForm,
   TemplateFormData,
-} from "@/pages/edit-template/components/template-form";
+} from "@/components/template-form";
 import { useNavigate, useParams } from "react-router";
 import { useTemplateQueryById } from "@/services/templates/queries";
 import { FullPageLoader } from "@/components/fulll-page-loader";
 import NotFoundPage from "../not-found-page";
 import { useUpdateTemplateMutation } from "@/services/templates/mutations";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export default function EditTemplatePage() {
   const { templateId } = useParams();
@@ -16,9 +17,13 @@ export default function EditTemplatePage() {
   const { data: template, isLoading } = useTemplateQueryById(templateId);
   const { mutate: updateTemplate } = useUpdateTemplateMutation();
   const { toast } = useToast();
-  if (!templateId) {
-    navigate("/not-found");
-  }
+
+  useEffect(() => {
+    if (!templateId) {
+      navigate("/not-found");
+    }
+  }, [templateId, navigate]);
+
   if (isLoading) {
     return <FullPageLoader />;
   }

@@ -23,7 +23,7 @@ export type TemplateFormData = {
   description: string;
   systemMessage: string;
   initialAssistantMessage: string;
-  reportGenerationPrompt: string | null;
+  reportGenerationPrompt?: string;
 };
 
 export type TemplateFormProps = {
