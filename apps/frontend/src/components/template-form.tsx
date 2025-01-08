@@ -15,7 +15,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
+import { Sparkles } from "lucide-react";
 
 export type TemplateFormData = {
   title: string;
@@ -48,9 +54,13 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
     initialAssistantMessage: z.string().min(1).max(1600, {
       message: "初期メッセージは1600文字以内で入力してください。",
     }),
-    reportGenerationPrompt: z.string().max(600, {
-      message: "書類作成時に気をつけるべき点は600文字以内で入力してください。",
-    }).optional(),
+    reportGenerationPrompt: z
+      .string()
+      .max(600, {
+        message:
+          "書類作成時に気をつけるべき点は600文字以内で入力してください。",
+      })
+      .optional(),
   });
   type TemplateFormSchema = z.infer<typeof schema>;
   const form = useForm<TemplateFormSchema>({
@@ -66,6 +76,17 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
   });
 
   const isSubmittable = form.formState.isDirty && form.formState.isValid;
+
+  const handleAiSuggest = () => {
+    // systemMessage
+    // initialAssistantMessageの値を取得
+    const title = form.getValues("title");
+    const overview = form.getValues("overview");
+    const description = form.getValues("description");
+    const systemMessage = form.getValues("systemMessage");
+    const initialAssistantMessage = form.getValues("initialAssistantMessage");
+    console.log(title, overview, description, systemMessage, initialAssistantMessage);
+  };
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -137,9 +158,11 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
                 name="systemMessage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      {t("templateForm.systemMessageLabel")}
-                    </FormLabel>
+                    <div className="flex justify-between items-center">
+                      <FormLabel>
+                        {t("templateForm.systemMessageLabel")}
+                      </FormLabel>
+                    </div>
                     <FormDescription>
                       {t("templateForm.systemMessageDescription")}
                     </FormDescription>
@@ -162,9 +185,11 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
                 name="initialAssistantMessage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      {t("templateForm.initialAssistantMessageLabel")}
-                    </FormLabel>
+                    <div className="flex justify-between items-center">
+                      <FormLabel>
+                        {t("templateForm.initialAssistantMessageLabel")}
+                      </FormLabel>
+                    </div>
                     <FormDescription>
                       {t("templateForm.initialAssistantMessageDescription")}
                     </FormDescription>
@@ -213,9 +238,31 @@ export const TemplateForm = ({ template, onSubmit }: TemplateFormProps) => {
               </div>
             )}
             <div className="flex justify-end">
-              <Button type="submit" disabled={!isSubmittable}>
-                {t("templateForm.saveButton")}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleAiSuggest}
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      AI
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {t(
+                        "templateForm.aiSuggestSystemMessageTooltip",
+                        "AIにシステムメッセージの提案を依頼する"
+                      )}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                <Button type="submit" disabled={!isSubmittable}>
+                  {t("templateForm.saveButton")}
+                </Button>
+              </div>
             </div>
           </form>
         </Form>
