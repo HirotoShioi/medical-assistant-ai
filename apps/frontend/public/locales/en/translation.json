@@ -1,4 +1,7 @@
 {
+  "templates": {
+    "new": "New Template"
+  },
   "auth": {
     "signedOut": "Signed out",
     "signedOutDescription": "You have been signed out",

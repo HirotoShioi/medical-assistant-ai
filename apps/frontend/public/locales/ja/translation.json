@@ -158,5 +158,8 @@
     "openInNewTab": "新規タブで開く",
     "openInNewTabDescription": "外部のウェブサイトへ移動しようとしています。続行しますか？",
     "cancel": "キャンセル"
+  },
+  "templates": {
+    "new": "新規テンプレート"
   }
 }
