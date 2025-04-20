@@ -22,6 +22,7 @@
     "llmModel": "AI Model",
     "gpt4oMiniDescription": "A lightweight model suitable for daily tasks",
     "gpt4oDescription": "A high-performance model capable of generating high-quality reports",
+    "o4miniDescription": "A model that prioritizes inference power",
     "loading": "Loading..."
   },
   "notFound": {

@@ -131,6 +131,11 @@ function SelectLlmModel({
       value: "gpt-4o",
       description: t("settings.gpt4oDescription"),
     },
+    {
+      name: "o4-mini",
+      value: "o4-mini",
+      description: t("settings.o4miniDescription"),
+    },
   ];
 
   return (

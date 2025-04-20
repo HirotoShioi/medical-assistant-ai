@@ -1,6 +1,5 @@
 import { getDocumentProxy, extractText } from "unpdf";
 import { convertTextToMarkdown } from "./ai/convert-text-to-markdown";
-import { analyzeImage } from "./ai/analyze-image";
 
 export type ParsedFileOutput = {
   content: string;
@@ -29,15 +28,6 @@ export async function parseFile(
       return {
         content,
         fileType,
-      };
-    }
-    case "image/png":
-    case "image/jpeg":
-    case "image/jpg": {
-      const result = await analyzeImage(blob, fileType);
-      return {
-        content: result,
-        fileType: "text/markdown",
       };
     }
     default: {

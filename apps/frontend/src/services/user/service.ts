@@ -8,7 +8,7 @@ async function getUserPreferences() {
   return preferences[0];
 }
 
-const LLMModel = ["gpt-4o-mini", "gpt-4o"] as const;
+const LLMModel = ["gpt-4o-mini", "gpt-4o", "o4-mini"] as const;
 async function updateUserPreferences(args: { llmModel: string }) {
   const inputSchema = z.object({
     llmModel: z.enum(LLMModel),

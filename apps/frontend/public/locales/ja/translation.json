@@ -22,6 +22,7 @@
     "llmModel": "AIモデル",
     "gpt4oMiniDescription": "日常のタスクに適した軽量なモデル",
     "gpt4oDescription": "高度なタスクに適した高性能モデル",
+    "o4miniDescription": "推論力を重視したモデル",
     "loading": "ユーザー設定を読み込み中..."
   },
   "notFound": {
