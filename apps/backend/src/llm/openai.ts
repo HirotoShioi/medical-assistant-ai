@@ -43,6 +43,7 @@ export function openaiBase(options: {
       'gpt-4o-mini-2024-07-18',
       'o1-preview',
       'o1-mini',
+      'o4-mini',
     ],
     requiredEnv: ['OPENAI_API_KEY'],
     invoke(req) {
